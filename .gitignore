@@ -1,0 +1,21 @@
+# Editors and operating system
+.idea/
+.vscode/
+.DS_Store
+
+# JavaScript
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+
+# Java
+target/
+*.log
+
+# Local infrastructure
+.terraform/
+*.tfstate
+*.tfstate.*
