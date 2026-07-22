@@ -33,6 +33,7 @@ necessarios para compreender e reproduzir o projeto.
 ## Desenvolvimento
 
 - [Estrategia de qualidade de codigo](development/code-quality.md)
+- [Integracao continua](development/continuous-integration.md)
 - [Definition of Done](development/definition-of-done.md)
 
 ## Politica de documentacao
