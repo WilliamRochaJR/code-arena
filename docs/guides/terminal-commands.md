@@ -112,6 +112,62 @@ git diff --stat
 Essas verificacoes identificam problemas de whitespace, mostram o estado e
 resumem o tamanho da alteracao.
 
+## Criar a aplicacao React com Vite
+
+```bash
+npm create vite@latest apps/web -- --template react-ts --no-interactive
+```
+
+O comando usa o criador oficial do Vite para gerar uma aplicacao React com
+TypeScript em `apps/web`. O template e revisado antes de instalar dependencias.
+
+## Instalar os npm workspaces
+
+```bash
+npm install
+```
+
+Executado na raiz, instala dependencias, cria `package-lock.json` e conecta os
+workspaces declarados no `package.json`.
+
+O primeiro teste com ESLint 10 revelou que ele exige Node 22.13 ou superior. Como
+o ambiente local usa Node 22.12, a configuracao foi ajustada para uma combinacao
+sem warnings de engine:
+
+```text
+Node.js: 22.12.0
+TypeScript: 5.9.3
+ESLint: 9.39.5
+typescript-eslint: 8.55.0
+```
+
+Essa decisao evita exigir uma atualizacao local apenas para o lint e mantem as
+versoes dentro das faixas suportadas entre si.
+
+## Executar a aplicacao web
+
+```bash
+npm run dev:web
+```
+
+O script inicia o Vite no workspace `@code-arena/web`.
+
+## Validar todos os workspaces
+
+```bash
+npm run format:check
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+- `format:check` verifica o padrao do Prettier sem alterar arquivos.
+- `lint` executa ESLint no monorepositorio.
+- `typecheck` valida os tipos de cada workspace.
+- `test` executa Vitest nos workspaces que possuem o script.
+- `build` gera a aplicacao e os pacotes.
+
 ## Comandos futuros
 
 Comandos de npm workspaces, frontend, SDK, UI, Spring Boot, Docker, testes e
