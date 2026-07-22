@@ -1,0 +1,80 @@
+name: Bug
+description: Registre um comportamento incorreto ou uma regressao.
+title: '[Bug]: '
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Inclua informacoes suficientes para outra pessoa reproduzir o problema sem adivinhar o contexto.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descricao
+      description: O que esta errado e qual impacto isso causa?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para reproduzir
+      placeholder: |
+        1. Acesse...
+        2. Selecione...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento esperado
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamento atual
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area afetada
+      options:
+        - Web
+        - API
+        - SDK
+        - UI
+        - Infraestrutura
+        - Documentacao
+        - Nao identificada
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Ambiente
+      description: Informe navegador, sistema, versao ou ambiente quando relevante.
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidencias
+      description: Adicione screenshots, logs sem dados sensiveis ou outras evidencias.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Verificacoes
+      options:
+        - label: Confirmei que nao ha tokens, credenciais ou dados sensiveis nas evidencias.
+          required: true
+        - label: Verifiquei que ainda nao existe uma issue equivalente.
+          required: true

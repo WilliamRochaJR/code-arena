@@ -27,76 +27,76 @@ uma alteracao posterior no cadastro mude o historico da tentativa.
 
 Representa o perfil interno associado a uma identidade autenticada.
 
-| Campo | Tipo | Regra |
-|---|---|---|
-| `id` | UUID | Identificador interno |
-| `identityProviderSubject` | string | Claim `sub`, unica e imutavel |
-| `email` | string | Dado de contato, nao e chave de identidade |
-| `displayName` | string opcional | Nome apresentado na interface |
-| `createdAt` | instante | Definido no servidor |
-| `lastLoginAt` | instante | Atualizado ao sincronizar o perfil |
+| Campo                     | Tipo            | Regra                                      |
+| ------------------------- | --------------- | ------------------------------------------ |
+| `id`                      | UUID            | Identificador interno                      |
+| `identityProviderSubject` | string          | Claim `sub`, unica e imutavel              |
+| `email`                   | string          | Dado de contato, nao e chave de identidade |
+| `displayName`             | string opcional | Nome apresentado na interface              |
+| `createdAt`               | instante        | Definido no servidor                       |
+| `lastLoginAt`             | instante        | Atualizado ao sincronizar o perfil         |
 
 ### Category
 
 Classifica questoes por assunto, por exemplo OOP, Collections e Streams.
 
-| Campo | Tipo | Regra |
-|---|---|---|
-| `id` | UUID | Identificador interno |
-| `slug` | string | Identificador publico unico e estavel |
-| `name` | string | Nome para exibicao |
-| `active` | boolean | Controla uso em novas tentativas |
+| Campo    | Tipo    | Regra                                 |
+| -------- | ------- | ------------------------------------- |
+| `id`     | UUID    | Identificador interno                 |
+| `slug`   | string  | Identificador publico unico e estavel |
+| `name`   | string  | Nome para exibicao                    |
+| `active` | boolean | Controla uso em novas tentativas      |
 
 ### Question
 
-| Campo | Tipo | Regra |
-|---|---|---|
-| `id` | UUID | Identificador interno |
-| `statement` | texto | Enunciado obrigatorio |
-| `difficulty` | enum | `BEGINNER`, `INTERMEDIATE` ou `ADVANCED` |
-| `explanation` | texto | Disponivel somente depois da conclusao |
-| `active` | boolean | Questao inativa nao entra em nova tentativa |
-| `createdAt` | instante | Definido no servidor |
-| `updatedAt` | instante | Definido no servidor |
+| Campo         | Tipo     | Regra                                       |
+| ------------- | -------- | ------------------------------------------- |
+| `id`          | UUID     | Identificador interno                       |
+| `statement`   | texto    | Enunciado obrigatorio                       |
+| `difficulty`  | enum     | `BEGINNER`, `INTERMEDIATE` ou `ADVANCED`    |
+| `explanation` | texto    | Disponivel somente depois da conclusao      |
+| `active`      | boolean  | Questao inativa nao entra em nova tentativa |
+| `createdAt`   | instante | Definido no servidor                        |
+| `updatedAt`   | instante | Definido no servidor                        |
 
 Uma questao pertence a uma ou mais categorias e possui pelo menos duas
 alternativas, exatamente uma delas correta.
 
 ### Alternative
 
-| Campo | Tipo | Regra |
-|---|---|---|
-| `id` | UUID | Identificador interno |
-| `questionId` | UUID | Questao proprietaria |
-| `text` | texto | Conteudo apresentado ao usuario |
-| `correct` | boolean | Nunca exposto durante a tentativa |
-| `displayOrder` | inteiro | Ordem estavel das alternativas |
+| Campo          | Tipo    | Regra                             |
+| -------------- | ------- | --------------------------------- |
+| `id`           | UUID    | Identificador interno             |
+| `questionId`   | UUID    | Questao proprietaria              |
+| `text`         | texto   | Conteudo apresentado ao usuario   |
+| `correct`      | boolean | Nunca exposto durante a tentativa |
+| `displayOrder` | inteiro | Ordem estavel das alternativas    |
 
 ### QuizAttempt
 
-| Campo | Tipo | Regra |
-|---|---|---|
-| `id` | UUID | Identificador interno |
-| `userId` | UUID | Proprietario da tentativa |
-| `difficulty` | enum | Filtro escolhido |
-| `status` | enum | Estado do ciclo de vida |
-| `totalQuestions` | inteiro | Dez no MVP |
-| `correctAnswers` | inteiro opcional | Calculado na conclusao |
-| `score` | decimal opcional | Percentual calculado no servidor |
-| `startedAt` | instante | Definido na criacao |
-| `completedAt` | instante opcional | Definido uma unica vez |
+| Campo            | Tipo              | Regra                            |
+| ---------------- | ----------------- | -------------------------------- |
+| `id`             | UUID              | Identificador interno            |
+| `userId`         | UUID              | Proprietario da tentativa        |
+| `difficulty`     | enum              | Filtro escolhido                 |
+| `status`         | enum              | Estado do ciclo de vida          |
+| `totalQuestions` | inteiro           | Dez no MVP                       |
+| `correctAnswers` | inteiro opcional  | Calculado na conclusao           |
+| `score`          | decimal opcional  | Percentual calculado no servidor |
+| `startedAt`      | instante          | Definido na criacao              |
+| `completedAt`    | instante opcional | Definido uma unica vez           |
 
 ### AttemptQuestion
 
-| Campo | Tipo | Regra |
-|---|---|---|
-| `id` | UUID | Identificador interno |
-| `attemptId` | UUID | Tentativa proprietaria |
-| `questionId` | UUID | Questao selecionada |
-| `position` | inteiro | Posicao unica dentro da tentativa |
-| `selectedAlternativeId` | UUID opcional | Alternativa escolhida |
-| `correct` | boolean opcional | Preenchido na conclusao |
-| `answeredAt` | instante opcional | Ultima alteracao da resposta |
+| Campo                   | Tipo              | Regra                             |
+| ----------------------- | ----------------- | --------------------------------- |
+| `id`                    | UUID              | Identificador interno             |
+| `attemptId`             | UUID              | Tentativa proprietaria            |
+| `questionId`            | UUID              | Questao selecionada               |
+| `position`              | inteiro           | Posicao unica dentro da tentativa |
+| `selectedAlternativeId` | UUID opcional     | Alternativa escolhida             |
+| `correct`               | boolean opcional  | Preenchido na conclusao           |
+| `answeredAt`            | instante opcional | Ultima alteracao da resposta      |
 
 ## Estados da tentativa
 

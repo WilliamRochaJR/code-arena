@@ -39,7 +39,7 @@ access token valido:
 const client = new JavaQuizClient({
   baseUrl,
   getAccessToken: () => authService.getAccessToken(),
-});
+})
 ```
 
 O `authService` coordena a renovacao para que requisicoes concorrentes aguardem
