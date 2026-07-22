@@ -99,4 +99,5 @@ registrada neste documento.
 - [Autenticacao](../../docs/architecture/authentication.md)
 - [Contratos REST](../../docs/api/contracts.md)
 - [Decisoes arquitetonicas](../../docs/decisions/README.md)
+- [Estrategia de qualidade](../../docs/development/code-quality.md)
 - [Comandos de terminal](../../docs/guides/terminal-commands.md)
