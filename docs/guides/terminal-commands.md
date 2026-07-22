@@ -168,6 +168,32 @@ npm run build
 - `test` executa Vitest nos workspaces que possuem o script.
 - `build` gera a aplicacao e os pacotes.
 
+## Instalar protecoes locais de commit
+
+```bash
+npm install --save-dev \
+  husky@^9.1.7 \
+  lint-staged@16.4.0 \
+  @commitlint/cli@^21.2.1 \
+  @commitlint/config-conventional@^21.2.0
+npx husky init
+```
+
+O Husky conecta hooks ao Git. `lint-staged` executa ESLint e Prettier apenas nos
+arquivos selecionados para o commit. Commitlint valida mensagens no formato
+Conventional Commits.
+
+Hooks configurados:
+
+```text
+pre-commit --> npx lint-staged
+commit-msg --> npx commitlint --edit "$1"
+```
+
+O script `prepare` reinstala os hooks automaticamente depois de `npm install`.
+Hooks ajudam no ambiente local, mas podem ser ignorados; o GitHub Actions sera a
+validacao independente antes do merge.
+
 ## Comandos futuros
 
 Comandos de npm workspaces, frontend, SDK, UI, Spring Boot, Docker, testes e
