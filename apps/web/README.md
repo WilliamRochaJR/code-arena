@@ -4,6 +4,16 @@ Aplicacao web do Code Arena, responsavel pela autenticacao, configuracao do
 questionario, execucao das tentativas, apresentacao dos resultados e historico
 do usuario.
 
+## Qualidade de codigo
+
+O frontend participa da estrategia compartilhada do monorepositorio, que combina
+TypeScript, ESLint, Prettier, Vitest, Husky, lint-staged e Commitlint. Essas
+ferramentas atuam em momentos diferentes, desde o desenvolvimento local ate a
+validacao do Pull Request.
+
+Consulte a [estrategia de qualidade](../../docs/development/code-quality.md) para
+entender o papel de cada ferramenta, quando ela roda e por que foi adotada.
+
 ## Responsabilidades
 
 - Renderizar uma interface responsiva e acessivel.
@@ -99,5 +109,4 @@ registrada neste documento.
 - [Autenticacao](../../docs/architecture/authentication.md)
 - [Contratos REST](../../docs/api/contracts.md)
 - [Decisoes arquitetonicas](../../docs/decisions/README.md)
-- [Estrategia de qualidade](../../docs/development/code-quality.md)
 - [Comandos de terminal](../../docs/guides/terminal-commands.md)
