@@ -174,12 +174,12 @@ Lista somente as tentativas do usuario autenticado.
 
 Query parameters:
 
-| Parametro | Padrao | Regra |
-|---|---:|---|
-| `page` | `0` | Inteiro maior ou igual a zero |
-| `size` | `10` | Entre 1 e 50 |
-| `status` | todos | `IN_PROGRESS` ou `COMPLETED` |
-| `sort` | `startedAt,desc` | Ordenacao permitida pelo contrato |
+| Parametro |           Padrao | Regra                             |
+| --------- | ---------------: | --------------------------------- |
+| `page`    |              `0` | Inteiro maior ou igual a zero     |
+| `size`    |             `10` | Entre 1 e 50                      |
+| `status`  |            todos | `IN_PROGRESS` ou `COMPLETED`      |
+| `sort`    | `startedAt,desc` | Ordenacao permitida pelo contrato |
 
 ```json
 {
@@ -223,15 +223,15 @@ Exemplo de erro de validacao:
 
 Codigos relevantes:
 
-| Codigo | Uso |
-|---:|---|
-| `400` | JSON ou campos invalidos |
-| `401` | autenticacao ausente ou invalida |
-| `403` | operacao nao autorizada |
-| `404` | recurso inexistente ou nao visivel |
-| `409` | estado atual impede a operacao |
-| `422` | dados validos, mas incompativeis com a regra de negocio |
-| `500` | falha interna sem exposicao de detalhes sensiveis |
+| Codigo | Uso                                                     |
+| -----: | ------------------------------------------------------- |
+|  `400` | JSON ou campos invalidos                                |
+|  `401` | autenticacao ausente ou invalida                        |
+|  `403` | operacao nao autorizada                                 |
+|  `404` | recurso inexistente ou nao visivel                      |
+|  `409` | estado atual impede a operacao                          |
+|  `422` | dados validos, mas incompativeis com a regra de negocio |
+|  `500` | falha interna sem exposicao de detalhes sensiveis       |
 
 ## Evolucao do contrato
 

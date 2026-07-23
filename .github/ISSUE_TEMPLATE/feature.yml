@@ -1,0 +1,60 @@
+name: Feature
+description: Proponha uma funcionalidade ou melhoria para o Code Arena.
+title: '[Feature]: '
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Descreva o problema e o resultado esperado antes de propor detalhes de implementacao.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema
+      description: Qual necessidade do usuario ou do projeto precisa ser atendida?
+      placeholder: Como usuario, preciso...
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Resultado esperado
+      description: Descreva o comportamento observavel depois da entrega.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Criterios de aceite
+      description: Liste condicoes objetivas que permitam validar a entrega.
+      placeholder: |
+        - [ ] Condicao observavel 1
+        - [ ] Condicao observavel 2
+    validations:
+      required: true
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Fora do escopo
+      description: Registre comportamentos relacionados que nao fazem parte desta entrega.
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Notas tecnicas
+      description: Dependencias, contratos, riscos ou decisoes que precisam ser refinados.
+
+  - type: checkboxes
+    id: readiness
+    attributes:
+      label: Refinamento
+      options:
+        - label: O problema esta descrito sem depender de uma solucao especifica.
+          required: true
+        - label: Os criterios de aceite podem ser testados.
+          required: true
