@@ -1,0 +1,164 @@
+# Configuracao do repositorio no GitHub
+
+Este guia registra as configuracoes aplicadas ao repositorio hospedado. Elas nao
+fazem parte do historico Git e precisam ser recriadas ao migrar o projeto para
+outro repositorio.
+
+Git controla commits, branches e tags. O GitHub adiciona Pull Requests,
+Rulesets, Actions, Issues, secrets e configuracoes de colaboracao.
+
+## Estado esperado
+
+```text
+Visibility: Public
+Default branch: main
+Permanent branches: main, develop
+Short-lived branches: feature/*, release/*, hotfix/*
+```
+
+`main` representa releases estaveis. `develop` integra a proxima versao.
+
+## Rulesets
+
+O repositorio publico usa dois Rulesets, um para cada branch permanente. A
+separacao permite que requisitos de release e integracao evoluam de forma
+independente.
+
+### Proteger main
+
+No GitHub, acesse `Settings > Rules > Rulesets > New ruleset > New branch
+ruleset` e configure:
+
+```text
+Ruleset name: Protect main
+Enforcement status: Active
+Bypass list: vazia
+Target branches: Include default branch
+```
+
+Ative:
+
+- `Restrict deletions`;
+- `Require a pull request before merging`;
+- `Require conversation resolution before merging`;
+- `Block force pushes`.
+
+Em `Require a pull request before merging`, mantenha zero aprovacoes
+obrigatorias enquanto o repositorio tiver um unico mantenedor. O autor nao pode
+aprovar o proprio Pull Request; exigir uma aprovacao impediria o fluxo sem
+adicionar uma revisao independente.
+
+### Proteger develop
+
+Crie outro branch ruleset com:
+
+```text
+Ruleset name: Protect develop
+Enforcement status: Active
+Bypass list: vazia
+Target branches: Include by pattern: develop
+```
+
+Ative as mesmas regras usadas em `Protect main`, inclusive Pull Request
+obrigatorio com zero aprovacoes.
+
+### Por que nao permitir bypass
+
+Uma bypass list vazia faz as regras valerem tambem para o mantenedor. Isso evita
+que um push direto acidental ignore o processo de Pull Request.
+
+Um bypass temporario so deve ser considerado para recuperacao de incidente, com
+escopo e motivo registrados.
+
+## Status checks
+
+`Require status checks to pass` deve permanecer desativado ate que o workflow
+execute com sucesso ao menos uma vez no repositorio. Depois disso, adicione o
+check `JavaScript quality` aos dois Rulesets.
+
+Essa sequencia evita bloquear todos os merges antes que o GitHub reconheca o
+nome do check. O check obrigatorio passa a garantir:
+
+```text
+format:check
+lint
+typecheck
+test
+build
+```
+
+Nao exigir inicialmente:
+
+- commits assinados, ate que a assinatura seja configurada;
+- historico linear, pois o projeto preserva merge commits de Pull Requests;
+- deployments, ate que exista um ambiente de entrega;
+- code scanning, ate que a ferramenta correspondente seja adotada.
+
+## Pull Requests e merge
+
+Em `Settings > General > Pull Requests`, preserve a estrategia de merge definida
+para o projeto e ative `Automatically delete head branches`.
+
+A automacao deve apagar somente branches curtas depois do merge. `main` e
+`develop` permanecem protegidas contra exclusao pelos Rulesets.
+
+Antes do merge, confirme explicitamente:
+
+```text
+feature/* --> develop
+release/* --> main
+hotfix/*  --> main
+```
+
+Correcoes de release e hotfix tambem precisam ser incorporadas em `develop`.
+Nunca use `develop` como head descartavel de um Pull Request para `main`.
+
+## GitHub Actions
+
+Em `Settings > Actions > General`, permita a execucao das actions oficiais usadas
+pelo workflow:
+
+```text
+actions/checkout
+actions/setup-node
+```
+
+O workflow atual declara somente permissao de leitura do conteudo:
+
+```yaml
+permissions:
+  contents: read
+```
+
+Permissoes de escrita devem ser adicionadas apenas quando uma entrega justificar
+seu uso. Uma restricao de billing pode impedir o inicio dos jobs mesmo quando o
+arquivo do workflow esta correto; nesse caso, os mesmos comandos devem ser
+executados localmente e a restricao tratada separadamente.
+
+## Itens nao transferidos pelo Git
+
+Ao migrar para outro repositorio, recrie e valide:
+
+- Rulesets e protecoes de branches;
+- configuracoes de merge e exclusao automatica;
+- Actions e permissoes do workflow;
+- secrets e variables;
+- environments;
+- Issues, Pull Requests e labels, quando precisarem ser preservados;
+- webhooks, GitHub Apps e integracoes externas.
+
+Os comandos usados na migracao do Code Arena estao no
+[guia de comandos de terminal](terminal-commands.md).
+
+## Checklist
+
+- `main` e a branch padrao;
+- `Protect main` esta ativo;
+- `Protect develop` esta ativo;
+- Pull Request e obrigatorio nas branches permanentes;
+- force push e exclusao estao bloqueados;
+- conversas precisam ser resolvidas;
+- bypass list permanece vazia;
+- branches curtas sao apagadas depois do merge;
+- o status check passa a ser obrigatorio somente depois de reconhecido;
+- secrets e permissoes nao sao expostos na documentacao.
