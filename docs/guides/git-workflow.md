@@ -77,6 +77,15 @@ base: develop
 compare: feature/NNN-descricao-curta
 ```
 
+`develop` e a base porque concentra as entregas que formarao a proxima versao.
+Features, correcoes de desenvolvimento e documentacao precisam ser integradas e
+validadas em conjunto antes de serem promovidas para `main`.
+
+Usar `main` como base de uma feature pularia essa etapa de integracao e colocaria
+uma mudanca ainda nao liberada na branch que representa producao e releases
+estaveis. `main` recebe Pull Requests de `release/*` e `hotfix/*`, nao o
+desenvolvimento cotidiano.
+
 O PR registra objetivo, criterios de aceite, validacoes, riscos e itens fora do
 escopo.
 
@@ -141,11 +150,17 @@ commitar tokens, senhas, chaves ou arquivos .env reais
 
 ## Protecao no GitHub
 
-Enquanto o repositorio estiver privado no plano atual, o GitHub informa que os
-Rulesets nao serao aplicados. Mesmo assim, devem ficar documentadas as regras:
+Git define branches, commits e historico; o GitHub adiciona Pull Requests,
+Rulesets, Actions e politicas sobre o repositorio hospedado. As configuracoes de
+protecao de `main` e `develop` estao no
+[guia de configuracao do GitHub](github-repository-settings.md).
 
-- exigir Pull Request para `main` e `develop`;
-- bloquear force push e exclusao das branches permanentes;
-- exigir resolucao de conversas;
-- exigir checks de CI quando eles existirem;
-- apagar automaticamente somente branches curtas depois do merge.
+As protecoes nao substituem a verificacao da direcao do Pull Request:
+
+```text
+feature/* --> develop
+release/* --> main
+hotfix/*  --> main
+```
+
+Correcoes de release e hotfix tambem precisam ser incorporadas em `develop`.

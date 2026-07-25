@@ -45,6 +45,68 @@ git remote add origin git@github.com:william-rocha/code-arena.git
 O primeiro comando cria o repositorio com `main` como branch inicial. O segundo
 associa o checkout local ao repositorio GitHub.
 
+## Migrar para outro repositorio
+
+O projeto foi transferido temporariamente para
+`https://github.com/WilliamRochaJR/code-arena` enquanto uma restricao de billing
+impedia o GitHub Actions na conta original. Antes da troca, as referencias do
+repositorio antigo foram atualizadas:
+
+```bash
+git status --short --branch
+git remote -v
+git branch -vv
+git tag --list
+git fetch --prune origin
+```
+
+O remote original foi preservado, e o novo repositorio passou a ser o `origin`:
+
+```bash
+git remote rename origin old-origin
+git remote add origin https://github.com/WilliamRochaJR/code-arena.git
+gh auth setup-git
+git remote -v
+```
+
+HTTPS foi usado porque a chave SSH disponivel autenticava a conta anterior. O
+GitHub CLI forneceu ao Git a autenticacao da nova conta sem incluir tokens nos
+comandos ou na configuracao versionada.
+
+As branches permanentes atualizadas foram enviadas diretamente das referencias
+do repositorio antigo:
+
+```bash
+git push origin \
+  refs/remotes/old-origin/main:refs/heads/main \
+  refs/remotes/old-origin/develop:refs/heads/develop
+```
+
+Depois do envio, as branches locais foram alinhadas ao novo remote:
+
+```bash
+git fetch origin
+git branch -f main origin/main
+git branch -f develop origin/develop
+git branch --set-upstream-to=origin/main main
+git branch --set-upstream-to=origin/develop develop
+git switch develop
+```
+
+Por fim, o estado foi conferido sem modificar o repositorio:
+
+```bash
+git status --short --branch
+git branch -vv
+git remote -v
+git ls-remote --heads origin
+```
+
+Git transfere commits, branches e tags, mas nao transfere Pull Requests, Issues,
+Rulesets, secrets nem configuracoes do repositorio. Esses itens precisam ser
+recriados no destino. O remote `old-origin` permanece disponivel como referencia
+e nao deve receber novos pushes durante a migracao temporaria.
+
 ## Conferir remoto e estado
 
 ```bash
