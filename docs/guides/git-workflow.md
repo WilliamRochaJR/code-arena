@@ -77,6 +77,15 @@ base: develop
 compare: feature/NNN-descricao-curta
 ```
 
+`develop` e a base porque concentra as entregas que formarao a proxima versao.
+Features, correcoes de desenvolvimento e documentacao precisam ser integradas e
+validadas em conjunto antes de serem promovidas para `main`.
+
+Usar `main` como base de uma feature pularia essa etapa de integracao e colocaria
+uma mudanca ainda nao liberada na branch que representa producao e releases
+estaveis. `main` recebe Pull Requests de `release/*` e `hotfix/*`, nao o
+desenvolvimento cotidiano.
+
 O PR registra objetivo, criterios de aceite, validacoes, riscos e itens fora do
 escopo.
 

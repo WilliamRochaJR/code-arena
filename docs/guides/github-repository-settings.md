@@ -72,12 +72,14 @@ escopo e motivo registrados.
 
 ## Status checks
 
-`Require status checks to pass` deve permanecer desativado ate que o workflow
-execute com sucesso ao menos uma vez no repositorio. Depois disso, adicione o
-check `JavaScript quality` aos dois Rulesets.
+Depois da primeira execucao bem-sucedida do workflow no repositorio, a regra
+`Require status checks to pass` foi ativada nos dois Rulesets com o check:
 
-Essa sequencia evita bloquear todos os merges antes que o GitHub reconheca o
-nome do check. O check obrigatorio passa a garantir:
+```text
+JavaScript quality
+```
+
+O check obrigatorio garante:
 
 ```text
 format:check
@@ -86,6 +88,15 @@ typecheck
 test
 build
 ```
+
+O GitHub precisa reconhecer um check em uma execucao anterior para oferece-lo na
+configuracao do Ruleset. Por isso a regra so foi ativada depois que o workflow
+passou no novo repositorio, evitando bloquear os merges com um requisito ainda
+indisponivel.
+
+`Require branches to be up to date before merging` permanece desativado. Essa
+opcao pode ser reavaliada quando houver mais contribuidores ou concorrencia
+frequente de Pull Requests.
 
 Nao exigir inicialmente:
 
@@ -109,6 +120,12 @@ feature/* --> develop
 release/* --> main
 hotfix/*  --> main
 ```
+
+`develop` e a base das features porque funciona como a branch de integracao da
+proxima versao. Ela permite combinar e validar entregas antes de promover uma
+release para `main`. Abrir uma feature diretamente contra `main` pula essa
+integracao e mistura trabalho em desenvolvimento com o estado estavel do
+produto.
 
 Correcoes de release e hotfix tambem precisam ser incorporadas em `develop`.
 Nunca use `develop` como head descartavel de um Pull Request para `main`.
@@ -160,5 +177,6 @@ Os comandos usados na migracao do Code Arena estao no
 - conversas precisam ser resolvidas;
 - bypass list permanece vazia;
 - branches curtas sao apagadas depois do merge;
-- o status check passa a ser obrigatorio somente depois de reconhecido;
+- `JavaScript quality` e obrigatorio nos dois Rulesets;
+- atualizacao da branch antes do merge nao e obrigatoria nesta etapa;
 - secrets e permissoes nao sao expostos na documentacao.
