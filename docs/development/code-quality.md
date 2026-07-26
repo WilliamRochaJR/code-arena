@@ -196,8 +196,9 @@ test
 build
 ```
 
-Quando o repositorio se tornar publico e os Rulesets forem aplicados, esses
-checks serao obrigatorios antes do merge.
+O repositorio publico possui Rulesets ativos para `main` e `develop`. O check
+`JavaScript quality` e obrigatorio antes do merge e executa esse conjunto de
+validacoes em um ambiente independente.
 
 ## Quando cada verificacao roda
 

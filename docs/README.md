@@ -27,6 +27,7 @@ necessarios para compreender e reproduzir o projeto.
 
 ## Guias
 
+- [Instrucoes para agentes de IA](../AGENTS.md)
 - [Fluxo de trabalho com Git](guides/git-workflow.md)
 - [Configuracao do repositorio no GitHub](guides/github-repository-settings.md)
 - [Comandos de terminal](guides/terminal-commands.md)

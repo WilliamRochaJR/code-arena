@@ -119,9 +119,10 @@ Husky e lint-staged oferecem feedback rapido antes do commit, mas podem ser
 ignorados ou variar conforme a maquina. A CI executa o conjunto completo em um
 ambiente limpo. As duas camadas sao complementares.
 
-Enquanto o repositorio privado nao tiver enforcement de Rulesets no plano atual,
-os checks devem ser respeitados manualmente. Quando ele se tornar publico, o job
-`JavaScript quality` sera configurado como status check obrigatorio.
+O repositorio publico possui os Rulesets `Protect main` e `Protect develop`. Os
+dois exigem o job `JavaScript quality` como status check antes do merge. As
+validacoes locais continuam necessarias para oferecer feedback antes do Pull
+Request e facilitar o diagnostico de falhas.
 
 ## Diagnostico
 
