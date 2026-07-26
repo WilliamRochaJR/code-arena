@@ -27,7 +27,8 @@ aplicaveis abaixo forem atendidos.
 ## Documentacao
 
 - README, guias, contratos e ADRs aplicaveis estao atualizados.
-- Novos comandos reproduziveis foram registrados.
+- Cada comando de terminal diferente usado na entrega foi registrado ao menos
+  uma vez, sem valores sensiveis.
 - A documentacao nao contem valores secretos.
 
 ## Entrega

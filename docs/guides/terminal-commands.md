@@ -1,15 +1,45 @@
 # Comandos de terminal
 
-Este documento registra comandos importantes usados para construir e operar o
-Code Arena. Ele funciona como referencia de estudo e trilha reproduzivel; nao e
-uma transcricao de toda consulta exploratoria.
+Este documento registra todos os comandos de terminal diferentes executados no
+trabalho do repositorio durante a construcao e operacao do Code Arena. Ele
+funciona como referencia de estudo, catalogo de diagnostico e trilha
+reproduzivel.
+
+Cada forma diferente de comando deve aparecer ao menos uma vez, inclusive quando
+for usada apenas para leitura, inspecao ou diagnostico. Repeticoes com a mesma
+finalidade nao precisam gerar entradas duplicadas; argumentos variaveis podem
+ser representados por placeholders. Comandos usados apenas para criar artefatos
+pessoais fora do repositorio nao fazem parte deste catalogo.
 
 ## Convencoes
 
 - Execute os comandos a partir da raiz do repositorio, salvo indicacao contraria.
 - Leia a explicacao antes de executar comandos que alteram branches ou estado.
 - Nunca copie credenciais reais para exemplos.
-- Atualize este guia quando um novo procedimento se tornar parte do projeto.
+- Registre um comando novo na mesma entrega em que ele for usado.
+- Documente o objetivo e se o comando apenas le ou tambem altera estado.
+- Use placeholders como `<numero>` e `<branch>` para valores que variam.
+- Nunca registre tokens, credenciais ou saidas que revelem valores sensiveis.
+
+## Inspecionar arquivos e localizar texto
+
+```bash
+rg --files docs apps packages
+rg -n "<padrao>" <arquivos-ou-diretorios>
+sed -n '<inicio>,<fim>p' <arquivo>
+```
+
+- `rg --files` lista arquivos sem alterar o repositorio.
+- `rg -n` localiza texto e mostra os numeros das linhas correspondentes.
+- `sed -n` imprime somente o intervalo solicitado de um arquivo.
+
+Para descobrir se uma ferramenta esta instalada e onde esta o executavel:
+
+```bash
+command -v <ferramenta>
+```
+
+O comando apenas consulta o ambiente e nao instala a ferramenta.
 
 ## Verificar ferramentas locais
 
@@ -119,6 +149,36 @@ git log --oneline --decorate --graph --all --max-count=15
 Esses comandos ajudam a confirmar remoto, branch atual, tracking e historico sem
 alterar arquivos.
 
+## Criar, trocar e remover uma branch local
+
+```bash
+git switch develop
+git switch -c <tipo>/<descricao>
+git branch -d <branch-mesclada>
+```
+
+- `git switch` troca a branch atual.
+- `git switch -c` cria e seleciona uma branch.
+- `git branch -d` remove apenas uma branch local reconhecida como integrada. A
+  opcao `-D` nao deve ser usada sem investigar e confirmar o descarte.
+
+## Revisar e criar um commit
+
+```bash
+git diff
+git add <caminhos>
+git diff --cached
+git diff --cached --check
+git diff --cached --stat
+git commit -m "tipo(escopo): descricao"
+```
+
+- `git diff` mostra mudancas ainda fora do stage.
+- `git add` seleciona explicitamente os arquivos do commit.
+- `git diff --cached` permite revisar exatamente o que sera commitado.
+- `--check` identifica whitespace invalido, e `--stat` resume o tamanho.
+- `git commit` cria o commit local e dispara os hooks do Husky.
+
 ## Publicacao inicial das branches
 
 ```bash
@@ -137,6 +197,66 @@ git fetch --prune origin
 
 O comando baixa referencias e remove localmente referencias de branches remotas
 que ja foram apagadas.
+
+## Conferir autenticacao e acesso ao GitHub
+
+```bash
+gh --version
+gh auth status
+ssh -T git@github.com
+git ls-remote <remote-ou-url>
+```
+
+- `gh --version` mostra a versao instalada do GitHub CLI.
+- `gh auth status` informa quais contas estao autenticadas, sem exibir o token
+  completo.
+- `ssh -T` confirma qual conta do GitHub esta associada a chave SSH.
+- `git ls-remote` lista referencias acessiveis sem clonar nem enviar commits.
+
+## Consultar repositorio, Pull Requests e Actions
+
+```bash
+gh repo view <owner>/<repositorio> \
+  --json nameWithOwner,visibility,defaultBranchRef,url,viewerPermission
+
+gh pr status --repo <owner>/<repositorio>
+
+gh pr view <numero-ou-branch> \
+  --repo <owner>/<repositorio> \
+  --json number,title,state,baseRefName,headRefName,mergeable,statusCheckRollup,url
+
+gh run list \
+  --repo <owner>/<repositorio> \
+  --branch <branch> \
+  --limit <quantidade>
+```
+
+Esses comandos consultam metadados do GitHub sem modificar o repositorio. Eles
+foram usados para confirmar a branch base, o estado do PR e a execucao do check
+`JavaScript quality`.
+
+## Consultar configuracoes pela API do GitHub
+
+```bash
+gh api repos/<owner>/<repositorio>
+gh api repos/<owner>/<repositorio>/rulesets
+gh api repos/<owner>/<repositorio>/rulesets/<id>
+```
+
+As consultas foram usadas para verificar configuracoes de merge e os detalhes
+dos Rulesets. O comando e somente leitura quando nao recebe uma opcao de metodo
+ou campos para escrita.
+
+## Alterar o URL de um remote
+
+```bash
+git remote set-url origin https://github.com/<owner>/<repositorio>.git
+gh auth setup-git
+```
+
+O primeiro comando altera apenas a configuracao local do remote. O segundo
+configura o Git para usar a autenticacao da conta ativa no GitHub CLI, sem
+gravar o token na documentacao.
 
 ## Atualizar sem merge implicito
 
@@ -205,6 +325,26 @@ typescript-eslint: 8.55.0
 
 Essa decisao evita exigir uma atualizacao local apenas para o lint e mantem as
 versoes dentro das faixas suportadas entre si.
+
+## Instalar dependencias de forma reproduzivel
+
+```bash
+npm ci
+```
+
+`npm ci` remove a instalacao atual de dependencias e restaura exatamente as
+versoes do `package-lock.json`. Ele nao cria commits nem faz push. O comando e
+usado na CI e pode ser executado localmente para reproduzir o ambiente do
+workflow.
+
+## Auditar dependencias npm
+
+```bash
+npm audit
+```
+
+O comando consulta vulnerabilidades conhecidas nas dependencias instaladas. Ele
+nao corrige nem atualiza pacotes sem a opcao explicita de correcao.
 
 ## Executar a aplicacao web
 
