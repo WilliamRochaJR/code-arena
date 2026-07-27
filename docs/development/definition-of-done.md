@@ -27,8 +27,8 @@ aplicaveis abaixo forem atendidos.
 ## Documentacao
 
 - README, guias, contratos e ADRs aplicaveis estao atualizados.
-- Cada comando de terminal diferente usado na entrega foi registrado ao menos
-  uma vez, sem valores sensiveis.
+- Todos os blocos de terminal executados na entrega foram registrados
+  cronologicamente, com objetivo e resultado, sem valores sensiveis.
 - A documentacao nao contem valores secretos.
 
 ## Entrega

@@ -32,7 +32,8 @@ necessarios para compreender e reproduzir o projeto.
 - [Fluxo de trabalho com Git](guides/git-workflow.md)
 - [Configuracao do repositorio no GitHub](guides/github-repository-settings.md)
 - [Versionamento, releases e tags](guides/versioning-and-releases.md)
-- [Comandos de terminal](guides/terminal-commands.md)
+- [Diario de comandos do terminal](guides/terminal-commands.md)
+- [Referencia de comandos](guides/command-reference.md)
 
 ## Desenvolvimento
 
@@ -49,7 +50,7 @@ necessarios para compreender e reproduzir o projeto.
   de cada entrega.
 - Segredos, tokens, credenciais e dados pessoais nao podem aparecer nos
   documentos nem no historico Git.
-- Todo comando de terminal diferente usado no projeto deve ser registrado ao
-  menos uma vez, inclusive para leitura e diagnostico. Repeticoes nao precisam
-  ser duplicadas, artefatos pessoais externos ficam fora do catalogo e valores
-  sensiveis nunca devem ser documentados.
+- Todos os blocos de terminal executados no trabalho do repositorio devem ser
+  registrados cronologicamente, inclusive repeticoes, leituras e diagnosticos.
+  Cada registro explica objetivo e resultado; artefatos pessoais externos e
+  valores sensiveis ficam fora do diario.

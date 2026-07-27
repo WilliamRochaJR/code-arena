@@ -109,4 +109,4 @@ registrada neste documento.
 - [Autenticacao](../../docs/architecture/authentication.md)
 - [Contratos REST](../../docs/api/contracts.md)
 - [Decisoes arquitetonicas](../../docs/decisions/README.md)
-- [Comandos de terminal](../../docs/guides/terminal-commands.md)
+- [Referencia de comandos](../../docs/guides/command-reference.md)

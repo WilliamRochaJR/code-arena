@@ -185,7 +185,7 @@ Ao migrar para outro repositorio, recrie e valide:
 - webhooks, GitHub Apps e integracoes externas.
 
 Os comandos usados na migracao do Code Arena estao no
-[guia de comandos de terminal](terminal-commands.md).
+[diario de comandos do terminal](terminal-commands.md).
 
 ## Checklist
 
