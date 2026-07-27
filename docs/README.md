@@ -24,12 +24,14 @@ necessarios para compreender e reproduzir o projeto.
 - [ADR 0001: usar um monorepositorio](decisions/0001-use-monorepo.md)
 - [ADR 0002: usar Git Flow simplificado](decisions/0002-use-simplified-git-flow.md)
 - [ADR 0003: manter o repositorio privado durante o desenvolvimento](decisions/0003-keep-repository-private-during-development.md)
+- [ADR 0004: usar Semantic Versioning e tags anotadas](decisions/0004-use-semantic-versioning.md)
 
 ## Guias
 
 - [Instrucoes para agentes de IA](../AGENTS.md)
 - [Fluxo de trabalho com Git](guides/git-workflow.md)
 - [Configuracao do repositorio no GitHub](guides/github-repository-settings.md)
+- [Versionamento, releases e tags](guides/versioning-and-releases.md)
 - [Comandos de terminal](guides/terminal-commands.md)
 
 ## Desenvolvimento

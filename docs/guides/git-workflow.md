@@ -132,6 +132,9 @@ git tag -a v1.0.0 -m "Code Arena 1.0.0"
 git push origin v1.0.0
 ```
 
+Os criterios para escolher a versao, preparar a release e proteger a tag estao
+no [guia de versionamento, releases e tags](versioning-and-releases.md).
+
 As correcoes exclusivas da release tambem precisam voltar para `develop` por um
 fluxo explicito que nao use `develop` como head descartavel.
 
