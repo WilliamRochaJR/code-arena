@@ -221,6 +221,11 @@ gh repo view <owner>/<repositorio> \
 
 gh pr status --repo <owner>/<repositorio>
 
+gh pr list \
+  --repo <owner>/<repositorio> \
+  --state <estado> \
+  --json number,title,baseRefName,headRefName,url
+
 gh pr view <numero-ou-branch> \
   --repo <owner>/<repositorio> \
   --json number,title,state,baseRefName,headRefName,mergeable,statusCheckRollup,url
@@ -234,6 +239,20 @@ gh run list \
 Esses comandos consultam metadados do GitHub sem modificar o repositorio. Eles
 foram usados para confirmar a branch base, o estado do PR e a execucao do check
 `JavaScript quality`.
+
+## Validar a politica de branches dos Pull Requests
+
+```bash
+bash -n .github/scripts/validate-pull-request-branch.sh
+bash -n .github/scripts/validate-pull-request-branch.test.sh
+bash .github/scripts/validate-pull-request-branch.test.sh
+bash .github/scripts/validate-pull-request-branch.sh <base> <origem>
+```
+
+`bash -n` valida a sintaxe sem executar o script. O arquivo de teste cobre
+cenarios permitidos e bloqueados. O validador avalia uma direcao especifica,
+como `release/1.0.0 -> main`. Os scripts apenas analisam os argumentos e retornam
+sucesso ou falha; nao alteram branches nem configuracoes do GitHub.
 
 ## Consultar configuracoes pela API do GitHub
 

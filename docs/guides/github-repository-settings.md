@@ -89,6 +89,16 @@ test
 build
 ```
 
+O Ruleset `Protect main` tambem deve exigir:
+
+```text
+Pull request policy
+```
+
+Esse check permite em `main` somente Pull Requests originados de `release/*` ou
+`hotfix/*`. Ele precisa executar com sucesso ao menos uma vez antes de aparecer
+na lista de status checks do Ruleset.
+
 O GitHub precisa reconhecer um check em uma execucao anterior para oferece-lo na
 configuracao do Ruleset. Por isso a regra so foi ativada depois que o workflow
 passou no novo repositorio, evitando bloquear os merges com um requisito ainda
@@ -126,6 +136,16 @@ proxima versao. Ela permite combinar e validar entregas antes de promover uma
 release para `main`. Abrir uma feature diretamente contra `main` pula essa
 integracao e mistura trabalho em desenvolvimento com o estado estavel do
 produto.
+
+O link generico criado depois de um push seleciona a branch padrao `main`. Para
+abrir o formulario com a base correta, use:
+
+```text
+https://github.com/WilliamRochaJR/code-arena/compare/develop...<branch>?quick_pull=1
+```
+
+Se um PR ainda for aberto contra `main` com uma origem inadequada, o check `Pull
+request policy` falha e o Ruleset impede o merge.
 
 Correcoes de release e hotfix tambem precisam ser incorporadas em `develop`.
 Nunca use `develop` como head descartavel de um Pull Request para `main`.
@@ -178,5 +198,6 @@ Os comandos usados na migracao do Code Arena estao no
 - bypass list permanece vazia;
 - branches curtas sao apagadas depois do merge;
 - `JavaScript quality` e obrigatorio nos dois Rulesets;
+- `Pull request policy` e obrigatorio em `Protect main`;
 - atualizacao da branch antes do merge nao e obrigatoria nesta etapa;
 - secrets e permissoes nao sao expostos na documentacao.

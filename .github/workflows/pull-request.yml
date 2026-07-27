@@ -14,6 +14,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  pull-request-policy:
+    name: Pull request policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Test branch policy
+        run: bash .github/scripts/validate-pull-request-branch.test.sh
+
+      - name: Validate pull request branches
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: bash .github/scripts/validate-pull-request-branch.sh "$BASE_REF" "$HEAD_REF"
+
   javascript-quality:
     name: JavaScript quality
     runs-on: ubuntu-latest

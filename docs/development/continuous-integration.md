@@ -48,6 +48,42 @@ actions/setup-node@v6
 
 ## Etapas
 
+O workflow possui dois jobs independentes:
+
+```text
+Pull request policy              JavaScript quality
+        |                                |
+testar politica                         checkout
+        |                                |
+validar base e origem                setup Node
+                                         |
+                                      npm ci
+                                         |
+                          format, lint, types, tests, build
+```
+
+Separar os jobs permite distinguir uma violacao do fluxo de branches de uma
+falha de qualidade JavaScript.
+
+### Politica do Pull Request
+
+O job `Pull request policy` executa:
+
+```bash
+bash .github/scripts/validate-pull-request-branch.test.sh
+bash .github/scripts/validate-pull-request-branch.sh "$BASE_REF" "$HEAD_REF"
+```
+
+Pull Requests destinados a `main` so podem partir de `release/*` ou `hotfix/*`.
+Uma feature, documentacao, chore, fix ou a propria `develop` direcionada a
+`main` faz o job falhar.
+
+Para `develop`, o job aceita branches curtas sem restringir seus prefixos nesta
+primeira versao. O fluxo esperado continua documentado e pode ser endurecido
+quando houver uma necessidade observada.
+
+### Qualidade JavaScript
+
 ```text
 checkout
    |
@@ -120,9 +156,11 @@ ignorados ou variar conforme a maquina. A CI executa o conjunto completo em um
 ambiente limpo. As duas camadas sao complementares.
 
 O repositorio publico possui os Rulesets `Protect main` e `Protect develop`. Os
-dois exigem o job `JavaScript quality` como status check antes do merge. As
-validacoes locais continuam necessarias para oferecer feedback antes do Pull
-Request e facilitar o diagnostico de falhas.
+dois exigem o job `JavaScript quality` como status check antes do merge.
+`Protect main` tambem exige `Pull request policy`, depois que o GitHub reconhece
+o novo check em sua primeira execucao. As validacoes locais continuam
+necessarias para oferecer feedback antes do Pull Request e facilitar o
+diagnostico de falhas.
 
 ## Diagnostico
 

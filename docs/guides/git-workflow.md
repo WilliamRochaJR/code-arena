@@ -86,6 +86,13 @@ uma mudanca ainda nao liberada na branch que representa producao e releases
 estaveis. `main` recebe Pull Requests de `release/*` e `hotfix/*`, nao o
 desenvolvimento cotidiano.
 
+O link generico exibido pelo `git push` usa a branch padrao `main` como base. Ao
+criar o PR pela interface, use uma URL de comparacao explicita:
+
+```text
+https://github.com/WilliamRochaJR/code-arena/compare/develop...<branch>?quick_pull=1
+```
+
 O PR registra objetivo, criterios de aceite, validacoes, riscos e itens fora do
 escopo.
 
@@ -162,5 +169,10 @@ feature/* --> develop
 release/* --> main
 hotfix/*  --> main
 ```
+
+O check `Pull request policy` bloqueia tecnicamente qualquer origem diferente de
+`release/*` ou `hotfix/*` quando a base e `main`. A validacao automatica evita
+que uma feature seja mesclada diretamente na branch estavel mesmo que o
+formulario do GitHub selecione a base incorreta.
 
 Correcoes de release e hotfix tambem precisam ser incorporadas em `develop`.
