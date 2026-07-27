@@ -305,13 +305,15 @@ permanentes no guia de Git.
 ## Validar documentacao antes do commit
 
 ```bash
+npx prettier --write <arquivos>
 git diff --check
 git status --short --branch
 git diff --stat
 ```
 
-Essas verificacoes identificam problemas de whitespace, mostram o estado e
-resumem o tamanho da alteracao.
+`npx prettier --write` formata somente os arquivos indicados. As verificacoes
+seguintes identificam problemas de whitespace, mostram o estado e resumem o
+tamanho da alteracao.
 
 ## Criar a aplicacao React com Vite
 
