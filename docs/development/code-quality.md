@@ -2,8 +2,9 @@
 
 Este documento explica como as ferramentas de qualidade do Code Arena se
 complementam, quando cada uma e executada e qual problema ela resolve. Os
-comandos de terminal usados no projeto permanecem no
-[guia de terminal](../guides/terminal-commands.md).
+comandos executados permanecem no
+[diario de terminal](../guides/terminal-commands.md), e os exemplos condensados
+ficam na [referencia de comandos](../guides/command-reference.md).
 
 ## Objetivo
 

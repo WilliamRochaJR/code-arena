@@ -1,47 +1,38 @@
-# Comandos de terminal
+# Diario de comandos do terminal
 
-Este documento registra todos os comandos de terminal diferentes executados no
-trabalho do repositorio durante a construcao e operacao do Code Arena. Ele
-funciona como referencia de estudo, catalogo de diagnostico e trilha
-reproduzivel.
+Este documento registra os comandos executados durante o desenvolvimento do Code
+Arena. O objetivo e preservar o fluxo real para estudo: o que foi executado, por
+que foi necessario e qual foi o resultado observado.
 
-Cada forma diferente de comando deve aparecer ao menos uma vez, inclusive quando
-for usada apenas para leitura, inspecao ou diagnostico. Repeticoes com a mesma
-finalidade nao precisam gerar entradas duplicadas; argumentos variaveis podem
-ser representados por placeholders. Comandos usados apenas para criar artefatos
-pessoais fora do repositorio nao fazem parte deste catalogo.
+Para exemplos resumidos e reutilizaveis, consulte a
+[referencia de comandos](command-reference.md).
 
-## Convencoes
+## Como este diario e mantido
 
-- Execute os comandos a partir da raiz do repositorio, salvo indicacao contraria.
-- Leia a explicacao antes de executar comandos que alteram branches ou estado.
-- Nunca copie credenciais reais para exemplos.
-- Registre um comando novo na mesma entrega em que ele for usado.
-- Documente o objetivo e se o comando apenas le ou tambem altera estado.
-- Use placeholders como `<numero>` e `<branch>` para valores que variam.
-- Nunca registre tokens, credenciais ou saidas que revelem valores sensiveis.
+- Os registros sao organizados cronologicamente e por atividade.
+- Blocos repetidos podem reaparecer quando fazem parte de fluxos diferentes.
+- Cada registro explica objetivo e resultado, sem copiar tokens ou saidas
+  sensiveis.
+- Comandos de leitura e diagnostico tambem sao registrados.
+- Operacoes feitas por ferramentas que nao sao um terminal, como edicao por
+  patch, nao sao apresentadas como comandos de shell.
+- Artefatos pessoais criados fora do repositorio nao fazem parte deste diario.
 
-## Inspecionar arquivos e localizar texto
+## Limite da reconstrucao historica
 
-```bash
-rg --files docs apps packages
-rg -n "<padrao>" <arquivos-ou-diretorios>
-sed -n '<inicio>,<fim>p' <arquivo>
-```
+A obrigacao de manter um diario integral foi definida depois que o projeto ja
+estava em andamento. Os registros de 22 a 27 de julho de 2026 foram reconstruidos
+a partir da conversa disponivel, historico Git, documentacao, Pull Requests e
+execucoes do Actions.
 
-- `rg --files` lista arquivos sem alterar o repositorio.
-- `rg -n` localiza texto e mostra os numeros das linhas correspondentes.
-- `sed -n` imprime somente o intervalo solicitado de um arquivo.
+Esses blocos preservam os comandos confirmados, mas podem nao conter cada
+consulta exploratoria antiga na ordem literal. A partir da entrega
+`docs/008-terminal-command-journal`, todos os blocos executados no terminal sao
+registrados durante a propria tarefa.
 
-Para descobrir se uma ferramenta esta instalada e onde esta o executavel:
+# 2026-07-22 - Inicio do projeto
 
-```bash
-command -v <ferramenta>
-```
-
-O comando apenas consulta o ambiente e nao instala a ferramenta.
-
-## Verificar ferramentas locais
+## Verificar as ferramentas locais
 
 ```bash
 java -version
@@ -52,7 +43,10 @@ npm --version
 yarn --version
 ```
 
-Versoes verificadas no inicio do projeto:
+Objetivo: descobrir quais versoes poderiam executar React e Spring Boot
+localmente.
+
+Resultado registrado:
 
 ```text
 Java: 21.0.11
@@ -62,57 +56,212 @@ npm: 10.9.0
 Yarn: 1.22.22
 ```
 
-Gradle e pnpm nao estavam instalados e nao sao necessarios para a stack
-escolhida.
-
 ## Inicializar o repositorio
 
 ```bash
 git init -b main
 git remote add origin git@github.com:william-rocha/code-arena.git
+git remote -v
+git status --short --branch
 ```
 
-O primeiro comando cria o repositorio com `main` como branch inicial. O segundo
-associa o checkout local ao repositorio GitHub.
+Objetivo: criar o repositorio local com `main`, associar o primeiro GitHub e
+conferir a configuracao.
 
-## Migrar para outro repositorio
+Resultado: o repositorio passou a usar
+`git@github.com:william-rocha/code-arena.git` como `origin`.
 
-O projeto foi transferido temporariamente para
-`https://github.com/WilliamRochaJR/code-arena` enquanto uma restricao de billing
-impedia o GitHub Actions na conta original. Antes da troca, as referencias do
-repositorio antigo foram atualizadas:
+## Publicar as branches iniciais
+
+```bash
+git push -u origin main
+git push -u origin develop
+git push -u origin feature/001-project-documentation
+```
+
+Objetivo: publicar as branches permanentes e a primeira entrega. `-u` configurou
+o tracking remoto.
+
+## Restaurar develop depois de uma exclusao acidental
+
+```bash
+git fetch --prune origin
+git switch develop
+git merge --ff-only origin/main
+git push -u origin develop
+```
+
+Objetivo: restaurar `develop` depois que a exclusao automatica removeu a branch
+usada como origem de um PR para `main`.
+
+Resultado: `develop` foi recriada sem reescrever o historico. O incidente
+motivou a regra de nunca usar `develop` como head descartavel.
+
+## Criar a aplicacao React
+
+```bash
+npm create vite@latest apps/web -- --template react-ts --no-interactive
+npm install
+```
+
+Objetivo: gerar o React com TypeScript e conectar os npm workspaces.
+
+Resultado: `apps/web`, `packages/java-quiz-sdk` e `packages/ui` passaram a ser
+administrados pelo `package-lock.json` da raiz.
+
+## Validar os workspaces
+
+```bash
+npm run format:check
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm audit
+```
+
+Objetivo: validar formatacao, analise estatica, tipos, testes, build e
+vulnerabilidades conhecidas.
+
+Resultado: os checks passaram. Os testes ainda usam `--passWithNoTests` enquanto
+nao existem casos implementados, e a auditoria registrou zero vulnerabilidades.
+
+## Instalar hooks e padrao de commits
+
+```bash
+npm install --save-dev \
+  husky@^9.1.7 \
+  lint-staged@16.4.0 \
+  @commitlint/cli@^21.2.1 \
+  @commitlint/config-conventional@^21.2.0
+
+npx husky init
+```
+
+Objetivo: instalar hooks locais, formatacao/lint de arquivos staged e validacao
+de Conventional Commits.
+
+Resultado:
+
+```text
+pre-commit --> npx lint-staged
+commit-msg --> npx commitlint --edit "$1"
+```
+
+## Reproduzir a instalacao da CI
+
+```bash
+npm ci
+```
+
+Objetivo: instalar exatamente o `package-lock.json` e reproduzir o ambiente do
+GitHub Actions.
+
+Resultado: dependencias restauradas sem criar commit ou push.
+
+## Inspecionar e validar documentacao
 
 ```bash
 git status --short --branch
-git remote -v
-git branch -vv
-git tag --list
-git fetch --prune origin
+git diff
+git diff --check
+git diff --stat
 ```
 
-O remote original foi preservado, e o novo repositorio passou a ser o `origin`:
+Objetivo: revisar alteracoes, encontrar whitespace invalido e conferir o escopo
+antes dos commits.
+
+# 2026-07-25 - Migracao para outro repositorio
+
+## Conferir GitHub CLI e identidade SSH
+
+```bash
+gh --version
+gh auth status
+ssh -T git@github.com
+```
+
+Objetivo: identificar qual conta seria usada pelo GitHub CLI e pela chave SSH.
+
+Resultado: o CLI estava autenticado como `WilliamRochaJR`, mas o SSH identificava
+`william-rocha`.
+
+## Atualizar o repositorio antigo e testar o destino
+
+```bash
+git fetch --prune origin
+git branch -avv
+git tag --list
+git ls-remote git@github.com:WilliamRochaJR/code-arena.git
+```
+
+Objetivo: baixar o estado final do repositorio antigo, conferir branches/tags e
+testar o acesso ao novo repositorio vazio.
+
+## Preservar o repositorio antigo
 
 ```bash
 git remote rename origin old-origin
-git remote add origin https://github.com/WilliamRochaJR/code-arena.git
-gh auth setup-git
+git remote add origin git@github.com:WilliamRochaJR/code-arena.git
 git remote -v
+git ls-remote origin
 ```
 
-HTTPS foi usado porque a chave SSH disponivel autenticava a conta anterior. O
-GitHub CLI forneceu ao Git a autenticacao da nova conta sem incluir tokens nos
-comandos ou na configuracao versionada.
+Objetivo: manter o repositorio anterior como `old-origin` e tornar o novo
+repositorio o destino principal.
 
-As branches permanentes atualizadas foram enviadas diretamente das referencias
-do repositorio antigo:
+Resultado: a configuracao local preservou os dois remotes.
+
+## Diagnosticar a primeira tentativa de push
 
 ```bash
 git push origin \
   refs/remotes/old-origin/main:refs/heads/main \
   refs/remotes/old-origin/develop:refs/heads/develop
+
+ssh -T git@github.com
+
+gh repo view WilliamRochaJR/code-arena \
+  --json nameWithOwner,viewerPermission,defaultBranchRef
 ```
 
-Depois do envio, as branches locais foram alinhadas ao novo remote:
+Objetivo: enviar `main` e `develop` e diagnosticar a negacao de permissao.
+
+Resultado: o push SSH falhou porque a chave pertencia a conta antiga; o GitHub
+CLI confirmou permissao `ADMIN` para `WilliamRochaJR`.
+
+## Trocar o novo remote para HTTPS
+
+```bash
+git remote set-url origin https://github.com/WilliamRochaJR/code-arena.git
+gh auth setup-git
+git remote -v
+```
+
+Objetivo: usar no Git a autenticacao da conta ativa no GitHub CLI, sem expor o
+token.
+
+## Transferir main e develop
+
+```bash
+git push origin \
+  refs/remotes/old-origin/main:refs/heads/main \
+  refs/remotes/old-origin/develop:refs/heads/develop
+
+git ls-remote --heads origin
+```
+
+Objetivo: enviar somente as branches permanentes atualizadas e confirmar seus
+commits no destino.
+
+Resultado:
+
+```text
+develop: fe44dae194594f37883996de69834165fe9c98fa
+main:    d6b9c54daedc8d514a9f936d7b30561babc82edb
+```
+
+## Alinhar branches locais ao novo origin
 
 ```bash
 git fetch origin
@@ -121,304 +270,464 @@ git branch -f develop origin/develop
 git branch --set-upstream-to=origin/main main
 git branch --set-upstream-to=origin/develop develop
 git switch develop
-```
-
-Por fim, o estado foi conferido sem modificar o repositorio:
-
-```bash
 git status --short --branch
 git branch -vv
-git remote -v
-git ls-remote --heads origin
+
+gh repo view WilliamRochaJR/code-arena \
+  --json url,defaultBranchRef,viewerPermission
 ```
 
-Git transfere commits, branches e tags, mas nao transfere Pull Requests, Issues,
-Rulesets, secrets nem configuracoes do repositorio. Esses itens precisam ser
-recriados no destino. O remote `old-origin` permanece disponivel como referencia
-e nao deve receber novos pushes durante a migracao temporaria.
+Objetivo: atualizar as branches locais, seus upstreams e confirmar `main` como
+branch padrao.
 
-## Conferir remoto e estado
+## Consultar configuracoes do novo repositorio
 
 ```bash
-git remote -v
-git status --short --branch
-git branch -vv
-git log --oneline --decorate --graph --all --max-count=15
+gh repo view WilliamRochaJR/code-arena \
+  --json nameWithOwner,visibility,defaultBranchRef,url
+
+gh api repos/WilliamRochaJR/code-arena \
+  --jq '{private, default_branch, delete_branch_on_merge, allow_merge_commit, allow_squash_merge, allow_rebase_merge}'
 ```
 
-Esses comandos ajudam a confirmar remoto, branch atual, tracking e historico sem
-alterar arquivos.
+Objetivo: verificar visibilidade, branch padrao, exclusao automatica e metodos de
+merge.
 
-## Criar, trocar e remover uma branch local
+Resultado: repositorio publico, `main` padrao e exclusao automatica inicialmente
+desativada.
+
+## Consultar Rulesets
+
+```bash
+gh api repos/WilliamRochaJR/code-arena/rulesets \
+  --jq '.[] | {id, name, enforcement, target}'
+
+gh api repos/WilliamRochaJR/code-arena/rulesets/19745468 \
+  --jq '{name, enforcement, conditions, bypass_actors, rules}'
+
+gh api repos/WilliamRochaJR/code-arena/rulesets/19745515 \
+  --jq '{name, enforcement, conditions, bypass_actors, rules}'
+```
+
+Objetivo: confirmar os Rulesets `Protect main` e `Protect develop`, targets,
+bypass e regras.
+
+Resultado: ambos ativos; a leitura identificou e permitiu corrigir a resolucao de
+conversas inicialmente ausente em `Protect main`.
+
+## Criar e publicar a documentacao dos Rulesets
 
 ```bash
 git switch develop
-git switch -c <tipo>/<descricao>
-git branch -d <branch-mesclada>
-```
+git pull --ff-only origin develop
+git switch -c docs/003-repository-rulesets
 
-- `git switch` troca a branch atual.
-- `git switch -c` cria e seleciona uma branch.
-- `git branch -d` remove apenas uma branch local reconhecida como integrada. A
-  opcao `-D` nao deve ser usada sem investigar e confirmar o descarte.
+npm run format:check
+git diff --check
+git status --short --branch
+git diff --stat
 
-## Revisar e criar um commit
+git add \
+  docs/README.md \
+  docs/guides/git-workflow.md \
+  docs/guides/github-repository-settings.md \
+  docs/guides/terminal-commands.md
 
-```bash
-git diff
-git add <caminhos>
-git diff --cached
 git diff --cached --check
 git diff --cached --stat
-git commit -m "tipo(escopo): descricao"
+git commit -m "docs(workflow): document GitHub rulesets and repository migration"
+
+git push -u origin docs/003-repository-rulesets
 ```
 
-- `git diff` mostra mudancas ainda fora do stage.
-- `git add` seleciona explicitamente os arquivos do commit.
-- `git diff --cached` permite revisar exatamente o que sera commitado.
-- `--check` identifica whitespace invalido, e `--stat` resume o tamanho.
-- `git commit` cria o commit local e dispara os hooks do Husky.
+Objetivo: documentar a migracao e as protecoes do GitHub em uma branch curta.
 
-## Publicacao inicial das branches
+Resultado: commit `239a0aa` publicado para PR com base `develop`.
+
+## Atualizar o mesmo Pull Request
 
 ```bash
-git push -u origin main
-git push -u origin develop
-git push -u origin feature/001-project-documentation
+git add \
+  docs/guides/git-workflow.md \
+  docs/guides/github-repository-settings.md
+
+git commit -m "docs(workflow): explain develop base and required checks"
+git push origin docs/003-repository-rulesets
+
+gh run list \
+  --repo WilliamRochaJR/code-arena \
+  --branch docs/003-repository-rulesets \
+  --limit 3
 ```
 
-`-u` configura a branch remota como upstream da branch local.
+Objetivo: explicar por que `develop` e a base e confirmar a nova execucao do
+Actions.
 
-## Sincronizar referencias
+Resultado: commit `7199c80` enviado; `JavaScript quality` entrou na fila e passou.
+
+# 2026-07-26 - Instrucoes de agentes e politica do diario
+
+## Criar as instrucoes para agentes
 
 ```bash
 git fetch --prune origin
+git switch develop
+git pull --ff-only origin develop
+git switch -c chore/004-agent-instructions
+
+npm run format:check
+git diff --check
+
+git add \
+  AGENTS.md \
+  docs/README.md \
+  docs/development/code-quality.md \
+  docs/development/continuous-integration.md
+
+git diff --cached --check
+git diff --cached --stat
+git commit -m "chore(ai): add repository agent instructions"
+git push -u origin chore/004-agent-instructions
 ```
 
-O comando baixa referencias e remove localmente referencias de branches remotas
-que ja foram apagadas.
+Objetivo: orientar agentes sobre arquitetura, qualidade, Git, confirmacao de
+commits/pushes e documentacao.
 
-## Conferir autenticacao e acesso ao GitHub
+Resultado: commit `36e444e`, posteriormente mesclado no PR #3.
+
+## Formalizar o registro de comandos
 
 ```bash
-gh --version
-gh auth status
-ssh -T git@github.com
-git ls-remote <remote-ou-url>
+git fetch --prune origin
+git switch develop
+git pull --ff-only origin develop
+git branch -d chore/004-agent-instructions
+git switch -c docs/005-terminal-command-policy
+
+rg -n "transcricao|exploratorio|comando|terminal" \
+  AGENTS.md docs/README.md docs/guides/terminal-commands.md
+
+sed -n '1,220p' docs/guides/terminal-commands.md
+sed -n '1,190p' AGENTS.md
 ```
 
-- `gh --version` mostra a versao instalada do GitHub CLI.
-- `gh auth status` informa quais contas estao autenticadas, sem exibir o token
-  completo.
-- `ssh -T` confirma qual conta do GitHub esta associada a chave SSH.
-- `git ls-remote` lista referencias acessiveis sem clonar nem enviar commits.
+Objetivo: localizar regras contraditorias e transformar o registro de comandos
+em obrigacao do projeto.
 
-## Consultar repositorio, Pull Requests e Actions
+## Validar e publicar a politica
 
 ```bash
-gh repo view <owner>/<repositorio> \
-  --json nameWithOwner,visibility,defaultBranchRef,url,viewerPermission
+npm run format:check
+git diff --check
+git status --short --branch
+git diff --stat
 
-gh pr status --repo <owner>/<repositorio>
+git add \
+  AGENTS.md \
+  docs/README.md \
+  docs/development/code-quality.md \
+  docs/development/definition-of-done.md \
+  docs/guides/terminal-commands.md
+
+git diff --cached --check
+git diff --cached --stat
+git commit -m "docs(workflow): require cataloging terminal commands"
+git push -u origin docs/005-terminal-command-policy
+```
+
+Objetivo: publicar a politica inicial. Resultado: commit `9ea8c74`, mesclado no
+PR #4.
+
+# 2026-07-27 - Politica de Pull Requests
+
+## Conferir a diferenca entre main e develop
+
+```bash
+git fetch --prune origin
+git log --oneline origin/main..origin/develop
+git diff --stat origin/main...origin/develop
 
 gh pr list \
-  --repo <owner>/<repositorio> \
-  --state <estado> \
+  --repo WilliamRochaJR/code-arena \
+  --state open \
   --json number,title,baseRefName,headRefName,url
-
-gh pr view <numero-ou-branch> \
-  --repo <owner>/<repositorio> \
-  --json number,title,state,baseRefName,headRefName,mergeable,statusCheckRollup,url
-
-gh run list \
-  --repo <owner>/<repositorio> \
-  --branch <branch> \
-  --limit <quantidade>
 ```
 
-Esses comandos consultam metadados do GitHub sem modificar o repositorio. Eles
-foram usados para confirmar a branch base, o estado do PR e a execucao do check
-`JavaScript quality`.
+Objetivo: entender o que seria promovido e confirmar que nao havia PR aberto.
 
-## Validar a politica de branches dos Pull Requests
+Resultado: `develop` continha apenas entregas de processo ainda nao publicadas em
+`main`; nenhuma release funcional justificava promocao.
+
+## Criar a branch da politica
+
+```bash
+git fetch --prune origin
+git switch develop
+git pull --ff-only origin develop
+git branch -d docs/005-terminal-command-policy
+git switch -c chore/006-pull-request-policy
+```
+
+Objetivo: iniciar a protecao automatica a partir da integracao atualizada.
+
+## Testar a politica de branches
+
+```bash
+bash .github/scripts/validate-pull-request-branch.test.sh
+
+bash .github/scripts/validate-pull-request-branch.sh \
+  develop chore/006-pull-request-policy
+
+if bash .github/scripts/validate-pull-request-branch.sh \
+  main feature/003-api-bootstrap
+then
+  echo "Unexpected policy success"
+  exit 1
+else
+  echo "Expected policy rejection confirmed"
+fi
+```
+
+Objetivo: confirmar cenarios permitidos, aceitar a entrega atual em `develop` e
+rejeitar de proposito uma feature destinada a `main`.
+
+Resultado: testes passaram; o caso incorreto retornou erro como esperado.
+
+## Executar a validacao completa
 
 ```bash
 bash -n .github/scripts/validate-pull-request-branch.sh
 bash -n .github/scripts/validate-pull-request-branch.test.sh
-bash .github/scripts/validate-pull-request-branch.test.sh
-bash .github/scripts/validate-pull-request-branch.sh <base> <origem>
-```
-
-`bash -n` valida a sintaxe sem executar o script. O arquivo de teste cobre
-cenarios permitidos e bloqueados. O validador avalia uma direcao especifica,
-como `release/1.0.0 -> main`. Os scripts apenas analisam os argumentos e retornam
-sucesso ou falha; nao alteram branches nem configuracoes do GitHub.
-
-## Consultar configuracoes pela API do GitHub
-
-```bash
-gh api repos/<owner>/<repositorio>
-gh api repos/<owner>/<repositorio>/rulesets
-gh api repos/<owner>/<repositorio>/rulesets/<id>
-```
-
-As consultas foram usadas para verificar configuracoes de merge e os detalhes
-dos Rulesets. O comando e somente leitura quando nao recebe uma opcao de metodo
-ou campos para escrita.
-
-## Alterar o URL de um remote
-
-```bash
-git remote set-url origin https://github.com/<owner>/<repositorio>.git
-gh auth setup-git
-```
-
-O primeiro comando altera apenas a configuracao local do remote. O segundo
-configura o Git para usar a autenticacao da conta ativa no GitHub CLI, sem
-gravar o token na documentacao.
-
-## Atualizar sem merge implicito
-
-```bash
-git pull --ff-only origin develop
-```
-
-`--ff-only` falha se a atualizacao exigiria um merge, permitindo investigar a
-divergencia antes de modificar o historico.
-
-## Restauracao de develop ocorrida no projeto
-
-A exclusao automatica de branches removeu `develop` quando ela foi usada como
-origem de um Pull Request para `main`. Como `origin/main` continha todo o
-historico aprovado, a restauracao foi feita com:
-
-```bash
-git switch develop
-git merge --ff-only origin/main
-git push -u origin develop
-```
-
-O merge em fast-forward atualizou a referencia local sem criar um commit novo; o
-push recriou a branch remota. O incidente motivou a observacao sobre branches
-permanentes no guia de Git.
-
-## Validar documentacao antes do commit
-
-```bash
-npx prettier --write <arquivos>
-git diff --check
-git status --short --branch
-git diff --stat
-```
-
-`npx prettier --write` formata somente os arquivos indicados. As verificacoes
-seguintes identificam problemas de whitespace, mostram o estado e resumem o
-tamanho da alteracao.
-
-## Criar a aplicacao React com Vite
-
-```bash
-npm create vite@latest apps/web -- --template react-ts --no-interactive
-```
-
-O comando usa o criador oficial do Vite para gerar uma aplicacao React com
-TypeScript em `apps/web`. O template e revisado antes de instalar dependencias.
-
-## Instalar os npm workspaces
-
-```bash
-npm install
-```
-
-Executado na raiz, instala dependencias, cria `package-lock.json` e conecta os
-workspaces declarados no `package.json`.
-
-O primeiro teste com ESLint 10 revelou que ele exige Node 22.13 ou superior. Como
-o ambiente local usa Node 22.12, a configuracao foi ajustada para uma combinacao
-sem warnings de engine:
-
-```text
-Node.js: 22.12.0
-TypeScript: 5.9.3
-ESLint: 9.39.5
-typescript-eslint: 8.55.0
-```
-
-Essa decisao evita exigir uma atualizacao local apenas para o lint e mantem as
-versoes dentro das faixas suportadas entre si.
-
-## Instalar dependencias de forma reproduzivel
-
-```bash
-npm ci
-```
-
-`npm ci` remove a instalacao atual de dependencias e restaura exatamente as
-versoes do `package-lock.json`. Ele nao cria commits nem faz push. O comando e
-usado na CI e pode ser executado localmente para reproduzir o ambiente do
-workflow.
-
-## Auditar dependencias npm
-
-```bash
-npm audit
-```
-
-O comando consulta vulnerabilidades conhecidas nas dependencias instaladas. Ele
-nao corrige nem atualiza pacotes sem a opcao explicita de correcao.
-
-## Executar a aplicacao web
-
-```bash
-npm run dev:web
-```
-
-O script inicia o Vite no workspace `@code-arena/web`.
-
-## Validar todos os workspaces
-
-```bash
 npm run format:check
 npm run lint
 npm run typecheck
 npm test
 npm run build
+git diff --check
+command -v actionlint
 ```
 
-- `format:check` verifica o padrao do Prettier sem alterar arquivos.
-- `lint` executa ESLint no monorepositorio.
-- `typecheck` valida os tipos de cada workspace.
-- `test` executa Vitest nos workspaces que possuem o script.
-- `build` gera a aplicacao e os pacotes.
+Objetivo: validar sintaxe Bash, qualidade do monorepositorio e disponibilidade de
+um validador adicional para workflows.
 
-## Instalar protecoes locais de commit
+Resultado: scripts e suite completa passaram. `actionlint` nao estava instalado e
+nao foi adicionado apenas para a entrega.
+
+## Publicar a politica
 
 ```bash
-npm install --save-dev \
-  husky@^9.1.7 \
-  lint-staged@16.4.0 \
-  @commitlint/cli@^21.2.1 \
-  @commitlint/config-conventional@^21.2.0
-npx husky init
+git add \
+  .github/scripts/validate-pull-request-branch.sh \
+  .github/scripts/validate-pull-request-branch.test.sh \
+  .github/workflows/pull-request.yml \
+  AGENTS.md \
+  docs/development/continuous-integration.md \
+  docs/guides/git-workflow.md \
+  docs/guides/github-repository-settings.md \
+  docs/guides/terminal-commands.md
+
+git diff --cached --check
+git diff --cached --stat
+git commit -m "ci(github): enforce pull request branch policy"
+git push -u origin chore/006-pull-request-policy
 ```
 
-O Husky conecta hooks ao Git. `lint-staged` executa ESLint e Prettier apenas nos
-arquivos selecionados para o commit. Commitlint valida mensagens no formato
-Conventional Commits.
+Objetivo: publicar o job `Pull request policy` e sua documentacao.
 
-Hooks configurados:
+Resultado: commit `fe13391`, mesclado no PR #5 depois que os dois checks passaram.
+
+## Confirmar o Ruleset de main
+
+```bash
+gh api repos/WilliamRochaJR/code-arena/rulesets/19745468 \
+  --jq '{name, enforcement, required_status_checks: [.rules[] | select(.type == "required_status_checks") | .parameters.required_status_checks[] | .context]}'
+```
+
+Objetivo: verificar se `Protect main` exige os checks corretos.
+
+Resultado:
 
 ```text
-pre-commit --> npx lint-staged
-commit-msg --> npx commitlint --edit "$1"
+JavaScript quality
+Pull request policy
 ```
 
-O script `prepare` reinstala os hooks automaticamente depois de `npm install`.
-Hooks ajudam no ambiente local, mas podem ser ignorados; o GitHub Actions sera a
-validacao independente antes do merge.
+# 2026-07-27 - Estrategia de versionamento
 
-## Comandos futuros
+## Criar a branch de documentacao
 
-Comandos de npm workspaces, frontend, SDK, UI, Spring Boot, Docker, testes e
-deploy serao adicionados quando as respectivas entregas forem implementadas e
-validadas.
+```bash
+git fetch --prune origin
+git switch develop
+git pull --ff-only origin develop
+git branch -d chore/006-pull-request-policy
+git switch -c docs/007-versioning-strategy
+```
+
+Objetivo: iniciar a documentacao de SemVer, releases e tags.
+
+## Ler o modelo de decisoes e os guias relacionados
+
+```bash
+sed -n '1,220p' docs/decisions/template.md
+sed -n '1,200p' docs/decisions/README.md
+sed -n '1,210p' docs/guides/git-workflow.md
+sed -n '1,120p' docs/README.md
+sed -n '100,160p' docs/roadmap.md
+```
+
+Objetivo: seguir o formato de ADR e evitar contradicoes com Git Flow e roadmap.
+
+## Formatar e validar
+
+```bash
+npx prettier --write \
+  docs/decisions/0004-use-semantic-versioning.md \
+  docs/guides/versioning-and-releases.md \
+  docs/README.md \
+  docs/guides/git-workflow.md \
+  docs/guides/terminal-commands.md
+
+npm run format:check
+git diff --check
+git tag --list
+rg -n "0004-use-semantic-versioning|versioning-and-releases" docs
+git status --short --branch
+git diff --stat
+```
+
+Objetivo: formatar os documentos, confirmar links e verificar que nenhuma tag
+real havia sido criada.
+
+Resultado: validacoes passaram e a lista de tags permaneceu vazia.
+
+## Publicar a estrategia
+
+```bash
+git add \
+  docs/decisions/0004-use-semantic-versioning.md \
+  docs/guides/versioning-and-releases.md \
+  docs/README.md \
+  docs/guides/git-workflow.md \
+  docs/guides/terminal-commands.md
+
+git diff --cached --check
+git diff --cached --stat
+git commit -m "docs(release): define versioning and tag strategy"
+git push -u origin docs/007-versioning-strategy
+```
+
+Objetivo: publicar a decisao e o guia de versionamento.
+
+Resultado: commit `63a1afe`, mesclado no PR #6 com os dois checks aprovados.
+
+# 2026-07-27 - Transformacao em diario cronologico
+
+## Sincronizar develop e criar a entrega
+
+```bash
+git fetch --prune origin
+git switch develop
+git pull --ff-only origin develop
+git branch -d docs/007-versioning-strategy
+git switch -c docs/008-terminal-command-journal
+```
+
+Objetivo: partir da integracao atualizada e criar uma branch apenas para a
+reestruturacao da documentacao.
+
+Resultado: `develop` avancou ate `07c8e04`, a branch mesclada foi removida
+localmente e `docs/008-terminal-command-journal` foi criada.
+
+## Reconstruir a linha do tempo
+
+```bash
+git log --reverse \
+  --date=iso-strict \
+  --format="%h|%ad|%s" \
+  --all
+
+gh pr list \
+  --repo WilliamRochaJR/code-arena \
+  --state all \
+  --limit 100 \
+  --json number,title,state,baseRefName,headRefName,mergedAt,url
+
+gh run list \
+  --repo WilliamRochaJR/code-arena \
+  --limit 30
+
+git remote -v
+git status --short --branch
+```
+
+Objetivo: usar commits, PRs, Actions, remotes e estado local como fontes da
+reconstrucao.
+
+Resultado: a cronologia confirmou entregas entre 22 e 27 de julho de 2026, seis
+PRs mesclados no novo repositorio e os remotes `origin` e `old-origin`.
+
+## Localizar referencias aos documentos de comandos
+
+```bash
+rg -n "terminal-commands|command-reference|Comandos de terminal|guia de terminal" \
+  AGENTS.md README.md docs apps packages
+```
+
+Objetivo: encontrar links e rotulos que ainda tratavam o diario como uma
+referencia resumida.
+
+Resultado: foram encontrados dois rotulos a corrigir no guia do GitHub e no
+README da web; os demais links estavam coerentes com a nova separacao.
+
+## Formatar e validar a transformacao do diario
+
+```bash
+npx prettier --write \
+  AGENTS.md \
+  apps/web/README.md \
+  docs/README.md \
+  docs/development/code-quality.md \
+  docs/development/definition-of-done.md \
+  docs/guides/command-reference.md \
+  docs/guides/github-repository-settings.md \
+  docs/guides/terminal-commands.md
+
+npm run format:check
+git diff --check
+git status --short --branch
+git diff --stat
+```
+
+Objetivo: formatar todos os documentos alterados, validar o repositorio e
+conferir o escopo da entrega.
+
+Resultado: Prettier e `git diff --check` passaram; a arvore continha somente os
+arquivos esperados da reestruturacao.
+
+## Criar o commit do diario
+
+```bash
+git add \
+  AGENTS.md \
+  apps/web/README.md \
+  docs/README.md \
+  docs/development/code-quality.md \
+  docs/development/definition-of-done.md \
+  docs/guides/github-repository-settings.md \
+  docs/guides/terminal-commands.md \
+  docs/guides/command-reference.md
+
+git diff --cached --check
+git diff --cached --stat
+git commit -m "docs(commands): create chronological terminal journal"
+
+git status --short --branch
+git log -1 --oneline --decorate
+```
+
+Objetivo: selecionar somente os arquivos da reestruturacao, revisar o stage,
+criar o commit aprovado e confirmar o estado final.
+
+Resultado: hooks de documentacao e Commitlint passaram; a arvore ficou limpa na
+branch `docs/008-terminal-command-journal`.
