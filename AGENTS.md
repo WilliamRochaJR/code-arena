@@ -49,6 +49,9 @@ Consulte antes de alterar comportamento ou arquitetura:
 - Abra Pull Requests de branches curtas para `develop`.
 - Use `release/*` para promover uma versao de `develop` para `main`.
 - Use `hotfix/*` a partir de `main` e incorpore a correcao tambem em `develop`.
+- Nunca direcione `feature/*`, `fix/*`, `docs/*`, `chore/*` ou `develop`
+  diretamente para `main`; o check `Pull request policy` deve bloquear esse
+  fluxo.
 - Nunca faca push direto em `main` ou `develop`.
 - Nunca use force push em uma branch compartilhada.
 - Use Conventional Commits com uma intencao por commit.
