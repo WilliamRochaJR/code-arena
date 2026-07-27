@@ -47,5 +47,7 @@ necessarios para compreender e reproduzir o projeto.
   de cada entrega.
 - Segredos, tokens, credenciais e dados pessoais nao podem aparecer nos
   documentos nem no historico Git.
-- Comandos exploratorios triviais nao precisam ser registrados; comandos que
-  alteram estado ou ajudam a reproduzir o trabalho devem ser documentados.
+- Todo comando de terminal diferente usado no projeto deve ser registrado ao
+  menos uma vez, inclusive para leitura e diagnostico. Repeticoes nao precisam
+  ser duplicadas, artefatos pessoais externos ficam fora do catalogo e valores
+  sensiveis nunca devem ser documentados.

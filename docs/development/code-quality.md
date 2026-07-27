@@ -2,7 +2,8 @@
 
 Este documento explica como as ferramentas de qualidade do Code Arena se
 complementam, quando cada uma e executada e qual problema ela resolve. Os
-comandos reproduziveis permanecem no [guia de terminal](../guides/terminal-commands.md).
+comandos de terminal usados no projeto permanecem no
+[guia de terminal](../guides/terminal-commands.md).
 
 ## Objetivo
 
