@@ -731,3 +731,142 @@ criar o commit aprovado e confirmar o estado final.
 
 Resultado: hooks de documentacao e Commitlint passaram; a arvore ficou limpa na
 branch `docs/008-terminal-command-journal`.
+
+## Publicar e confirmar a entrega do diario
+
+```bash
+git push -u origin docs/008-terminal-command-journal
+git status --short --branch
+gh pr view docs/008-terminal-command-journal \
+  --repo WilliamRochaJR/code-arena \
+  --json number,title,state,baseRefName,mergeable,statusCheckRollup,url
+```
+
+Objetivo: publicar a branch aprovada, conferir seu rastreamento e verificar o
+Pull Request criado para `develop`.
+
+Resultado: a branch foi publicada e o PR #7 foi mesclado em `develop` com os
+checks `Pull request policy` e `JavaScript quality` aprovados.
+
+# 2026-07-27 - Documentacao da estrategia de observabilidade
+
+## Inspecionar as regras e a documentacao existente
+
+```bash
+pwd
+sed -n '1,240p' AGENTS.md
+find docs -maxdepth 2 -type f | sort
+sed -n '1,240p' docs/README.md
+tail -n 120 docs/guides/terminal-commands.md
+git status --short --branch
+```
+
+Objetivo: confirmar o repositorio, as regras de colaboracao, a estrutura da
+documentacao, o final do diario e o estado da branch antes da alteracao.
+
+Resultado: o repositorio estava limpo na branch ja mesclada
+`docs/008-terminal-command-journal`; nao havia um documento especifico de
+observabilidade.
+
+## Sincronizar develop e criar a entrega
+
+```bash
+git fetch --prune origin
+git switch develop
+git pull --ff-only origin develop
+git branch -d docs/008-terminal-command-journal
+git switch -c docs/009-observability-strategy
+
+sed -n '1,260p' docs/architecture/overview.md
+sed -n '1,260p' docs/roadmap.md
+```
+
+Objetivo: partir da integracao atualizada, remover a branch local ja mesclada,
+criar uma branch curta e consultar a arquitetura e o roadmap.
+
+Resultado: `develop` avancou ate `4fa222c`, a branch anterior foi removida e
+`docs/009-observability-strategy` foi criada. A leitura confirmou os pontos em
+que a estrategia deveria ser referenciada.
+
+## Formatar e validar a documentacao de observabilidade
+
+```bash
+npx prettier --write \
+  docs/README.md \
+  docs/architecture/overview.md \
+  docs/architecture/observability.md \
+  docs/roadmap.md \
+  docs/guides/terminal-commands.md
+
+npm run format:check
+git diff --check
+git status --short --branch
+git diff --stat
+git diff -- docs/architecture/observability.md docs/roadmap.md
+```
+
+Objetivo: aplicar a formatacao do repositorio, validar os arquivos Markdown e
+revisar o escopo e o conteudo principal da entrega.
+
+Resultado: Prettier, `format:check` e `git diff --check` passaram. O diff ficou
+restrito ao novo guia e aos documentos de arquitetura, roadmap, indice e diario
+que precisam referencia-lo.
+
+## Preparar a revisao anterior ao commit
+
+```bash
+git status --short --branch
+git diff --check
+npm run format:check
+git diff --stat
+git diff --name-status
+```
+
+Objetivo: confirmar a branch e os arquivos alterados, repetir as validacoes
+obrigatorias e preparar o resumo que sera apresentado antes do commit.
+
+Resultado: as validacoes passaram e o status confirmou cinco arquivos no
+escopo. Como o novo documento ainda nao estava rastreado, os dois ultimos
+comandos mostraram apenas os quatro arquivos modificados.
+
+## Incluir o novo arquivo na revisao e validar o diario
+
+```bash
+git diff --no-index --stat /dev/null docs/architecture/observability.md || true
+npx prettier --write docs/guides/terminal-commands.md
+npm run format:check
+git diff --check
+git status --short --branch
+```
+
+Objetivo: revisar separadamente o tamanho do arquivo ainda nao rastreado,
+formatar o diario atualizado e executar a validacao final antes de propor o
+commit.
+
+Resultado: o novo documento foi incluido na revisao de escopo; Prettier,
+`format:check` e `git diff --check` passaram, e os cinco arquivos esperados
+permaneceram na arvore de trabalho.
+
+## Criar o commit da estrategia de observabilidade
+
+```bash
+git add \
+  docs/README.md \
+  docs/architecture/overview.md \
+  docs/architecture/observability.md \
+  docs/guides/terminal-commands.md \
+  docs/roadmap.md
+
+git diff --cached --check
+git diff --cached --stat
+git commit -m "docs(observability): define monitoring strategy"
+
+git status --short --branch
+git log -1 --oneline --decorate
+```
+
+Objetivo: selecionar somente a documentacao da estrategia, revisar o stage,
+criar o commit aprovado e confirmar o estado final da branch.
+
+Resultado: as validacoes do stage e os hooks passaram; o commit foi criado e a
+arvore de trabalho ficou limpa.
