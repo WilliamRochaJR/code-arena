@@ -32,7 +32,8 @@ Branch: `feature/003-api-bootstrap`
 - Usar Java 21, Maven Wrapper e Spring Boot 3.5.x.
 - Adicionar Web, Validation, Data JPA, PostgreSQL, Flyway, Security, OAuth2
   Resource Server, Actuator e suporte a testes com Testcontainers.
-- Configurar perfis e verificacao inicial de saude.
+- Configurar perfis, verificacao inicial de saude e metricas para Prometheus.
+- Usar SLF4J com Logback e logs direcionados ao console.
 - Adicionar PostgreSQL ao Docker Compose para desenvolvimento.
 
 ## Entrega 4 - Persistencia do dominio
@@ -103,6 +104,7 @@ Branch: `feature/010-containerization-e2e`
 
 - Criar Dockerfiles multi-stage para web e API.
 - Criar composicao completa com health checks.
+- Adicionar Prometheus, Grafana e um dashboard local versionado.
 - Executar containers sem privilegios quando aplicavel.
 - Adicionar testes E2E com Playwright.
 - Documentar execucao local com e sem containers.
@@ -133,3 +135,5 @@ Branch: `release/1.0.0`
 - Internacionalizacao e tema escuro.
 - Importacao controlada de questoes.
 - Revisao direcionada de respostas incorretas.
+- Centralizacao de logs com Loki no Grafana.
+- Tracing com OpenTelemetry e Tempo.

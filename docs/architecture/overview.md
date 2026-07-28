@@ -51,6 +51,8 @@ code-arena/
 - Selecionar questoes, persistir respostas e calcular resultados.
 - Publicar contratos REST com DTOs e validacao de entrada.
 - Persistir dados no PostgreSQL com schema versionado pelo Flyway.
+- Expor health checks, metricas e logs conforme a
+  [estrategia de observabilidade](observability.md).
 
 ## Comunicacao
 
@@ -81,10 +83,14 @@ para facilitar hot reload e depuracao. O PostgreSQL executa em Docker Compose.
 
 ```text
 React/Vite :5173 --> Spring Boot :8080 --> PostgreSQL :5432
+                            |
+                            `--> Actuator/Prometheus
 ```
 
 Uma composicao completa com frontend, API e banco sera adicionada antes do
 primeiro release para oferecer uma execucao reproduzivel com um unico comando.
+Prometheus e Grafana serao adicionados posteriormente para observar a API no
+ambiente local.
 
 ## Destino de producao
 

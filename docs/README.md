@@ -13,6 +13,7 @@ necessarios para compreender e reproduzir o projeto.
 - [Visao geral](architecture/overview.md)
 - [Modelo de dominio](architecture/domain-model.md)
 - [Autenticacao e autorizacao](architecture/authentication.md)
+- [Observabilidade](architecture/observability.md)
 
 ## API
 
