@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    password: ${DB_PASSWORD:code_arena}
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/code_arena}
+    username: ${DB_USERNAME:code_arena}
+
+logging:
+  level:
+    com.williamrocha.codearena: DEBUG

@@ -89,6 +89,18 @@ test
 build
 ```
 
+O backend adiciona o check:
+
+```text
+Java quality
+```
+
+Depois que ele executar pela primeira vez no Pull Request da API e aparecer na
+lista do GitHub, adicione-o a `Require status checks to pass` em `Protect main`
+e `Protect develop`. Ele executa o Maven Wrapper com Java 21, testes e
+empacotamento da API. Ate essa configuracao manual ser concluida, o job existe
+na workflow, mas ainda nao e uma exigencia dos Rulesets.
+
 O Ruleset `Protect main` tambem deve exigir:
 
 ```text
@@ -198,6 +210,8 @@ Os comandos usados na migracao do Code Arena estao no
 - bypass list permanece vazia;
 - branches curtas sao apagadas depois do merge;
 - `JavaScript quality` e obrigatorio nos dois Rulesets;
+- `Java quality` sera adicionado aos dois Rulesets depois de sua primeira
+  execucao;
 - `Pull request policy` e obrigatorio em `Protect main`;
 - atualizacao da branch antes do merge nao e obrigatoria nesta etapa;
 - secrets e permissoes nao sao expostos na documentacao.

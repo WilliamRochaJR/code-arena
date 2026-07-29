@@ -29,7 +29,7 @@ Branch: `feature/002-monorepo-setup`
 Branch: `feature/003-api-bootstrap`
 
 - Gerar Spring Boot pelo Spring Initializr em `apps/api`.
-- Usar Java 21, Maven Wrapper e Spring Boot 3.5.x.
+- Usar Java 21, Maven Wrapper e Spring Boot 4.1.0.
 - Adicionar Web, Validation, Data JPA, PostgreSQL, Flyway, Security, OAuth2
   Resource Server, Actuator e suporte a testes com Testcontainers.
 - Configurar perfis, verificacao inicial de saude e metricas para Prometheus.
