@@ -124,13 +124,14 @@ do Pull Request.
 
 - Atualize README, guias e contratos quando uma mudanca alterar o uso ou o
   comportamento do projeto.
-- Registre em `docs/guides/terminal-commands.md` cada comando de terminal
-  executado no trabalho do repositorio durante a tarefa, inclusive repeticoes,
-  comandos de leitura e diagnostico. Organize por data e atividade, explique
-  objetivo e resultado, nao inclua artefatos pessoais externos e nunca registre
-  valores sensiveis.
-- Mantenha exemplos condensados e reutilizaveis em
-  `docs/guides/command-reference.md`; o diario deve preservar o fluxo executado.
+- Mantenha em `docs/guides/terminal-commands/` um catalogo de estudo organizado
+  por assunto. Antes de registrar um comando reutilizavel, confirme que ele
+  ainda nao existe no catalogo.
+- Nao registre datas, repeticoes, a cronologia de tarefas nem comandos
+  ocasionais de leitura e diagnostico. Explique objetivo, efeito e cuidados do
+  comando uma unica vez no arquivo tematico adequado.
+- Nunca registre valores sensiveis. Use placeholders para URLs, identificadores
+  e valores que variam.
 - Registre decisoes arquiteturais relevantes em um ADR dentro de
   `docs/decisions/`.
 - Diferencie claramente estado implementado, decisao atual e trabalho planejado.
