@@ -82,10 +82,13 @@ Durante o desenvolvimento, React e Spring Boot executam diretamente na maquina
 para facilitar hot reload e depuracao. O PostgreSQL executa em Docker Compose.
 
 ```text
-React/Vite :5173 --> Spring Boot :8080 --> PostgreSQL :5432
+React/Vite :5173 --> Spring Boot :8080 --> PostgreSQL :5433 (host)
                             |
                             `--> Actuator/Prometheus
 ```
+
+O Compose publica a porta interna `5432` do PostgreSQL como `5433` no host para
+evitar conflito com instalacoes locais do banco.
 
 Uma composicao completa com frontend, API e banco sera adicionada antes do
 primeiro release para oferecer uma execucao reproduzivel com um unico comando.

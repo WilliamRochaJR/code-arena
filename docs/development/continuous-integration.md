@@ -35,35 +35,39 @@ deploys. Pipelines futuros devem receber somente as permissoes necessarias.
 
 - Runner hospedado pelo GitHub com Ubuntu.
 - Node obtido de `.nvmrc`.
+- Java 21 com distribuicao Eclipse Temurin.
 - Cache de dependencias npm administrado por `actions/setup-node`.
+- Cache de dependencias Maven administrado por `actions/setup-java`.
 - Instalacao reproduzivel com `npm ci` e `package-lock.json`.
-- Timeout de dez minutos para evitar jobs presos indefinidamente.
+- Maven Wrapper como versao reproduzivel do Maven.
+- Timeouts por job para evitar execucoes presas indefinidamente.
 
 O workflow usa actions oficiais nas linhas atuais:
 
 ```text
 actions/checkout@v6
 actions/setup-node@v6
+actions/setup-java@v5
 ```
 
 ## Etapas
 
-O workflow possui dois jobs independentes:
+O workflow possui tres jobs independentes:
 
 ```text
-Pull request policy              JavaScript quality
-        |                                |
-testar politica                         checkout
-        |                                |
-validar base e origem                setup Node
-                                         |
-                                      npm ci
-                                         |
-                          format, lint, types, tests, build
+Pull request policy       JavaScript quality       Java quality
+        |                         |                     |
+testar politica                checkout              checkout
+        |                         |                     |
+validar base e origem         setup Node           setup Java 21
+                                  |                     |
+                               npm ci            Maven Wrapper verify
+                                  |
+                   format, lint, types, tests, build
 ```
 
 Separar os jobs permite distinguir uma violacao do fluxo de branches de uma
-falha de qualidade JavaScript.
+falha de qualidade JavaScript ou Java.
 
 ### Politica do Pull Request
 
@@ -143,11 +147,15 @@ npm run build
 
 Confirma que web, SDK e UI podem gerar seus artefatos.
 
-## Backend futuro
+### Qualidade Java
 
-Quando `apps/api` for criado, o workflow recebera um job Java independente com
-JDK 21, cache Maven e `./mvnw verify`. Separar os jobs permite identificar se uma
-falha pertence ao ecossistema JavaScript ou Java.
+```bash
+cd apps/api
+./mvnw --batch-mode --no-transfer-progress verify
+```
+
+Compila a API, executa os testes e empacota a aplicacao. Os testes de integracao
+usam Testcontainers e exigem o Docker disponivel no runner.
 
 ## Relacao com hooks locais
 
@@ -158,9 +166,10 @@ ambiente limpo. As duas camadas sao complementares.
 O repositorio publico possui os Rulesets `Protect main` e `Protect develop`. Os
 dois exigem o job `JavaScript quality` como status check antes do merge.
 `Protect main` tambem exige `Pull request policy`, depois que o GitHub reconhece
-o novo check em sua primeira execucao. As validacoes locais continuam
-necessarias para oferecer feedback antes do Pull Request e facilitar o
-diagnostico de falhas.
+o novo check em sua primeira execucao. Depois da primeira execucao do backend,
+`Java quality` tambem deve ser marcado como obrigatorio nos dois Rulesets. As
+validacoes locais continuam necessarias para oferecer feedback antes do Pull
+Request e facilitar o diagnostico de falhas.
 
 ## Diagnostico
 

@@ -870,3 +870,773 @@ criar o commit aprovado e confirmar o estado final da branch.
 
 Resultado: as validacoes do stage e os hooks passaram; o commit foi criado e a
 arvore de trabalho ficou limpa.
+
+## Publicar a estrategia de observabilidade
+
+```bash
+git push -u origin docs/009-observability-strategy
+```
+
+Objetivo: publicar a branch aprovada para permitir a abertura do Pull Request
+direcionado a `develop`.
+
+Resultado: a branch foi publicada no remote `origin` e passou a rastrear
+`origin/docs/009-observability-strategy`. O Pull Request foi posteriormente
+mesclado em `develop`.
+
+# 2026-07-27 - Bootstrap da API Spring Boot
+
+## Sincronizar develop e verificar o ambiente local
+
+```bash
+git fetch --prune origin
+git switch develop
+git pull --ff-only origin develop
+git branch -d docs/009-observability-strategy
+
+java -version
+javac -version
+mvn -version
+docker --version
+docker compose version
+```
+
+Objetivo: partir da integracao atualizada, remover a branch ja mesclada e
+confirmar as ferramentas disponiveis para executar a API localmente.
+
+Resultado: `develop` avancou ate `120c897`; a branch anterior foi removida. O
+ambiente possui Java e Javac 21.0.11, Maven global 3.6.3, Docker 27.5.1 e Docker
+Compose 2.30.3. O projeto usara seu proprio Maven Wrapper.
+
+## Criar a branch da API
+
+```bash
+git switch -c feature/003-api-bootstrap
+git status --short --branch
+```
+
+Objetivo: isolar o bootstrap da API em uma branch curta baseada em `develop`.
+
+Resultado: a branch limpa `feature/003-api-bootstrap` foi criada.
+
+## Consultar versoes e dependencias no Spring Initializr
+
+```bash
+curl -fsSL https://start.spring.io/metadata/client |
+node -e '
+  let input = "";
+  process.stdin.on("data", chunk => input += chunk);
+  process.stdin.on("end", () => {
+    const metadata = JSON.parse(input);
+    const wanted = new Set([
+      "web", "validation", "data-jpa", "postgresql", "flyway",
+      "security", "oauth2-resource-server", "actuator",
+      "prometheus", "testcontainers"
+    ]);
+    const dependencies = metadata.dependencies.values
+      .flatMap(group => group.values)
+      .filter(item => wanted.has(item.id))
+      .map(({ id, name }) => ({ id, name }));
+
+    console.log(JSON.stringify({
+      bootVersion: metadata.bootVersion,
+      javaVersion: metadata.javaVersion,
+      dependencies
+    }, null, 2));
+  });
+'
+```
+
+Objetivo: consultar a fonte oficial antes de escolher a versao do Spring Boot e
+os identificadores das dependencias.
+
+Resultado: o Initializr informou Spring Boot 4.1.0 como release estavel padrao,
+suporte a Java 21 e confirmou todos os identificadores solicitados.
+
+## Procurar dependencias especificas de PostgreSQL e Testcontainers
+
+```bash
+curl -fsSL https://start.spring.io/metadata/client |
+node -e '
+  let input = "";
+  process.stdin.on("data", chunk => input += chunk);
+  process.stdin.on("end", () => {
+    const metadata = JSON.parse(input);
+    const matches = metadata.dependencies.values
+      .flatMap(group => group.values)
+      .filter(item =>
+        /testcontainer|postgres/i.test(`${item.id} ${item.name}`)
+      )
+      .map(({ id, name }) => ({ id, name }));
+
+    console.log(JSON.stringify(matches, null, 2));
+  });
+'
+```
+
+Objetivo: verificar se o gerador exigia um identificador adicional para testes
+com PostgreSQL.
+
+Resultado: o catalogo possui apenas `postgresql` e `testcontainers` para esse
+escopo; o projeto gerado combinou ambos e incluiu o modulo PostgreSQL de
+Testcontainers no `pom.xml`.
+
+## Procurar uma convencao existente de package Java
+
+```bash
+rg -n "groupId|artifactId|base package|package Java|com\\." \
+  README.md docs package.json apps packages \
+  --glob '!**/node_modules/**'
+```
+
+Objetivo: evitar introduzir um group, artifact ou package em conflito com uma
+convencao ja documentada.
+
+Resultado: nenhuma convencao Java havia sido definida. Foram escolhidos o group
+`com.williamrocha`, o artifact `code-arena-api` e o package
+`com.williamrocha.codearena`.
+
+## Gerar o projeto pelo Spring Initializr
+
+```bash
+test ! -e apps/api
+api_archive_path="$(mktemp /tmp/code-arena-api-XXXXXX.zip)"
+
+curl -fsSLG https://start.spring.io/starter.zip \
+  --data-urlencode type=maven-project \
+  --data-urlencode language=java \
+  --data-urlencode bootVersion=4.1.0.RELEASE \
+  --data-urlencode baseDir=code-arena-api \
+  --data-urlencode groupId=com.williamrocha \
+  --data-urlencode artifactId=code-arena-api \
+  --data-urlencode name="Code Arena API" \
+  --data-urlencode description="API REST do Code Arena" \
+  --data-urlencode packageName=com.williamrocha.codearena \
+  --data-urlencode packaging=jar \
+  --data-urlencode javaVersion=21 \
+  --data-urlencode dependencies=web,validation,data-jpa,postgresql,flyway,security,oauth2-resource-server,actuator,prometheus,testcontainers \
+  --output "$api_archive_path"
+
+unzip -l "$api_archive_path"
+mkdir -p apps/api
+unzip -q "$api_archive_path" -d apps/api
+find apps/api -maxdepth 3 -type f | sort
+```
+
+Objetivo: baixar o scaffold oficial para um arquivo temporario, revisar o ZIP e
+extrai-lo na area reservada a API.
+
+Resultado: o Initializr gerou Maven Wrapper, aplicacao, configuracao, testes e
+dependencias solicitadas. O `baseDir` do ZIP criou inicialmente o nivel extra
+`apps/api/code-arena-api`.
+
+## Corrigir o nivel do diretorio gerado e inspecionar o scaffold
+
+```bash
+test -d apps/api/code-arena-api
+test ! -e apps/code-arena-api.generated
+mv apps/api/code-arena-api apps/code-arena-api.generated
+rmdir apps/api
+mv apps/code-arena-api.generated apps/api
+
+find apps/api -maxdepth 4 -type f | sort
+sed -n '1,260p' apps/api/pom.xml
+sed -n '1,160p' apps/api/src/main/resources/application.properties
+git status --short
+```
+
+Objetivo: mover o conteudo gerado um nivel acima sem descartar arquivos e
+revisar a estrutura, o POM e a configuracao inicial.
+
+Resultado: a API passou a ocupar diretamente `apps/api`. O POM continha as
+dependencias esperadas, incluindo Logback indiretamente pelo starter de logging,
+Micrometer Prometheus e Testcontainers PostgreSQL.
+
+## Inspecionar os fontes e executar o primeiro build
+
+```bash
+find apps/api/src -type f -print -exec sed -n '1,220p' {} \;
+cd apps/api
+./mvnw --version
+./mvnw verify
+```
+
+Objetivo: revisar todos os fontes gerados, confirmar o Maven Wrapper e validar o
+scaffold antes de personaliza-lo.
+
+Resultado: o wrapper instalou Maven 3.9.16, mas o build falhou porque o
+Initializr escreveu o parent `4.1.0.RELEASE`, coordenada ausente no Maven
+Central.
+
+## Confirmar a coordenada publicada no Maven Central
+
+```bash
+curl -fsSL \
+  https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-starter-parent/maven-metadata.xml |
+sed -n '1,220p'
+
+curl -fsSI \
+  https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-starter-parent/4.1.0/spring-boot-starter-parent-4.1.0.pom |
+sed -n '1,20p'
+```
+
+Objetivo: investigar a falha na fonte de artefatos consumida pelo Maven antes
+de alterar a versao gerada.
+
+Resultado: o Maven Central confirmou `4.1.0` como latest e release, e respondeu
+HTTP 200 para o POM sem o sufixo `.RELEASE`. O parent e o roadmap foram
+corrigidos para `4.1.0`.
+
+## Validar o scaffold com a versao publicada
+
+```bash
+cd apps/api
+./mvnw verify
+```
+
+Objetivo: comprovar a compilacao e a integracao inicial depois de corrigir a
+coordenada do Spring Boot.
+
+Resultado: o build passou com Java 21 e Maven Wrapper 3.9.16. O teste iniciou
+PostgreSQL com Testcontainers, executou Flyway, criou o contexto JPA e carregou
+a aplicacao Spring Boot 4.1.0 com sucesso.
+
+## Validar a documentacao e o estado da primeira etapa
+
+```bash
+npx prettier --write docs/guides/terminal-commands.md docs/roadmap.md
+npm run format:check
+git diff --check
+git status --short --branch
+```
+
+Objetivo: formatar os documentos atualizados, validar o repositorio e conferir
+o escopo ao encerrar a geracao inicial da API.
+
+Resultado: a formatacao dos dois documentos passou, mas `format:check`
+identificou que o `apps/api/HELP.md` gerado pelo Initializr ainda nao seguia o
+Prettier do monorepositorio. A branch continha somente o scaffold e as
+atualizacoes esperadas de roadmap e diario.
+
+## Formatar o documento gerado e repetir as validacoes
+
+```bash
+npx prettier --write apps/api/HELP.md
+npm run format:check
+git diff --check
+git status --short --branch
+```
+
+Objetivo: adequar o Markdown gerado ao padrao do monorepositorio e repetir as
+validacoes da etapa.
+
+Resultado: Prettier, `format:check` e `git diff --check` passaram. A branch
+permaneceu sem commits, contendo o scaffold em `apps/api` e as atualizacoes
+esperadas de roadmap e diario.
+
+# 2026-07-28 - Configuracao da fundacao da API
+
+## Inspecionar scaffold, CI e documentacao
+
+```bash
+git status --short --branch
+find apps/api -path '*/target' -prune -o -type f -print | sort
+sed -n '1,260p' apps/api/pom.xml
+sed -n '1,240p' apps/web/README.md
+sed -n '1,280p' .github/workflows/pull-request.yml
+rg -n "docker compose|compose.yaml|actuator|SecurityFilterChain|issuer-uri" \
+  . --glob '!**/node_modules/**' --glob '!apps/api/target/**'
+tail -n 100 docs/guides/terminal-commands.md
+```
+
+Objetivo: revisar a arvore gerada, os padroes de documentacao, a workflow e
+configuracoes existentes antes de personalizar o bootstrap.
+
+Resultado: nao havia Compose, configuracao explicita de seguranca nem job Java.
+O scaffold continha somente as configuracoes padrao do Initializr.
+
+## Localizar o suporte de MockMvc no Spring Boot 4
+
+```bash
+jar tf \
+  ~/.m2/repository/org/springframework/boot/spring-boot-webmvc-test/4.1.0/spring-boot-webmvc-test-4.1.0.jar |
+rg 'AutoConfigureMockMvc|MockMvc'
+```
+
+Objetivo: confirmar o novo package da anotacao de teste depois da reorganizacao
+de modulos do Spring Boot 4.
+
+Resultado: `AutoConfigureMockMvc` foi localizado em
+`org.springframework.boot.webmvc.test.autoconfigure`.
+
+## Formatar configuracoes, validar o Compose e testar a API
+
+```bash
+npx prettier --write \
+  .github/workflows/pull-request.yml \
+  apps/api/README.md \
+  apps/api/src/main/resources/application.yml \
+  apps/api/src/main/resources/application-local.yml \
+  compose.yaml \
+  docs/roadmap.md
+
+docker compose config
+cd apps/api
+./mvnw --batch-mode --no-transfer-progress verify
+```
+
+Objetivo: formatar os arquivos suportados, validar a definicao do PostgreSQL
+local e testar configuracoes, seguranca e health check.
+
+Resultado: o Compose foi considerado valido e os tres testes iniciais passaram.
+O relatorio do contexto revelou que o exporter Prometheus nao estava ativo no
+ambiente de teste.
+
+## Localizar propriedades de metricas no cache Maven
+
+```bash
+for metadata_jar in \
+  ~/.m2/repository/org/springframework/boot/spring-boot-*-autoconfigure/4.1.0/*.jar
+do
+  unzip -p "$metadata_jar" META-INF/spring-configuration-metadata.json 2>/dev/null
+done |
+rg -C 3 '"name": "management\..*(prometheus|metrics.export)'
+```
+
+Objetivo: procurar a propriedade oficial de Prometheus nos modulos de
+autoconfiguracao mais comuns do Spring Boot 4.
+
+Resultado: o primeiro filtro encontrou apenas metadados legados de Wavefront,
+exigindo uma busca em todos os modulos do Boot.
+
+## Localizar o modulo e as propriedades de Prometheus
+
+```bash
+find ~/.m2/repository/org/springframework/boot \
+  -path '*/4.1.0/*.jar' -type f |
+sort |
+while read -r boot_jar
+do
+  if unzip -p "$boot_jar" META-INF/spring-configuration-metadata.json 2>/dev/null |
+    rg -qi 'prometheus'
+  then
+    echo "$boot_jar"
+    unzip -p "$boot_jar" META-INF/spring-configuration-metadata.json |
+      rg -C 4 'prometheus'
+  fi
+done
+```
+
+Objetivo: identificar a propriedade atual sem depender de nomes de modulos
+anteriores.
+
+Resultado: o modulo `spring-boot-micrometer-metrics` confirmou
+`management.prometheus.metrics.export.enabled` e o endpoint Prometheus.
+
+## Confirmar o controle global de exporters
+
+```bash
+find ~/.m2/repository/org/springframework/boot \
+  -path '*/4.1.0/*.jar' -type f |
+sort |
+while read -r boot_jar
+do
+  unzip -p "$boot_jar" META-INF/spring-configuration-metadata.json 2>/dev/null
+done |
+rg -C 4 'management\.defaults\.metrics\.export\.enabled'
+```
+
+Objetivo: entender por que o exporter estava desativado apesar do default
+especifico do Prometheus.
+
+Resultado: a propriedade global tambem possui default `true`; o ambiente de
+teste do Spring Boot a desativa para evitar exporters acidentais. O Prometheus
+foi ativado explicitamente na aplicacao.
+
+## Repetir os testes com o endpoint Prometheus
+
+```bash
+cd apps/api
+./mvnw --batch-mode --no-transfer-progress verify
+```
+
+Objetivo: comprovar que health, Prometheus e a politica provisoria de seguranca
+funcionam com PostgreSQL real em Testcontainers.
+
+Resultado: quatro testes passaram, o contexto expos tres endpoints Actuator e
+`/actuator/prometheus` respondeu com sucesso.
+
+## Revisar documentos afetados pela API e CI
+
+```bash
+sed -n '1,260p' README.md
+sed -n '1,300p' docs/development/continuous-integration.md
+sed -n '1,260p' docs/development/definition-of-done.md
+```
+
+Objetivo: localizar referencias que ainda tratavam a API e o job Java como
+trabalho futuro.
+
+Resultado: o README raiz e o guia de CI precisavam refletir a API criada, o
+Maven Wrapper e o terceiro job da workflow.
+
+## Localizar os checks documentados dos Rulesets
+
+```bash
+rg -n -C 5 "JavaScript quality|required|obrigatorio|status check" \
+  docs/guides/github-repository-settings.md
+```
+
+Objetivo: encontrar onde registrar a inclusao futura de `Java quality` como
+check obrigatorio.
+
+Resultado: o guia listava apenas `JavaScript quality` nos dois Rulesets e `Pull
+request policy` em `main`. Foi adicionada a instrucao para configurar `Java
+quality` depois de sua primeira execucao no GitHub.
+
+## Executar a validacao final da fundacao
+
+```bash
+npx prettier --write \
+  README.md \
+  .github/workflows/pull-request.yml \
+  apps/api/README.md \
+  apps/api/src/main/resources/application.yml \
+  apps/api/src/main/resources/application-local.yml \
+  compose.yaml \
+  docs/development/continuous-integration.md \
+  docs/guides/github-repository-settings.md \
+  docs/guides/terminal-commands.md \
+  docs/roadmap.md
+
+npm run format:check
+git diff --check
+docker compose config --quiet
+cd apps/api
+./mvnw --batch-mode --no-transfer-progress verify
+cd ../..
+git status --short --branch
+git diff --stat
+```
+
+Objetivo: formatar toda a documentacao e configuracao alterada, validar
+whitespace e Compose, repetir o build Java e revisar o escopo final.
+
+Resultado: Prettier, `format:check`, `git diff --check`, Compose e Maven
+passaram. Os quatro testes da API ficaram verdes e o diff permaneceu restrito ao
+bootstrap, CI, execucao local e documentacao relacionada.
+
+## Revisar o escopo antes da proposta de commit
+
+```bash
+git status --short --branch
+find apps/api -path '*/target' -prune -o -type f -print | sort
+git diff --check
+git diff --stat
+git diff --name-status
+git diff -- .github/workflows/pull-request.yml README.md \
+  docs/development/continuous-integration.md \
+  docs/guides/github-repository-settings.md docs/roadmap.md
+git check-ignore -v \
+  apps/api/target \
+  apps/api/target/code-arena-api-0.0.1-SNAPSHOT.jar
+```
+
+Objetivo: conferir todos os arquivos da fundacao da API, revisar as alteracoes
+rastreadas e garantir que artefatos Maven nao entrariam no commit.
+
+Resultado: o escopo correspondeu ao bootstrap planejado, `git diff --check`
+passou e `apps/api/.gitignore` ignorou tanto `target` quanto o JAR gerado.
+
+## Consultar o ponto de insercao no diario
+
+```bash
+tail -n 100 docs/guides/terminal-commands.md
+git status --short --branch
+```
+
+Objetivo: localizar o final do diario para registrar a revisao pre-commit e
+reconfirmar a branch e o estado do repositorio.
+
+Resultado: o ultimo registro era a validacao da fundacao e a branch continuava
+como `feature/003-api-bootstrap`, apenas com as mudancas esperadas.
+
+## Validar a documentacao depois do registro pre-commit
+
+```bash
+npx prettier --write docs/guides/terminal-commands.md
+npm run format:check
+git diff --check
+git status --short --branch
+git diff --stat
+```
+
+Objetivo: formatar o novo registro, repetir as validacoes aplicaveis e produzir
+o resumo final que sera apresentado antes de qualquer commit.
+
+Resultado: o Prettier nao precisou alterar o diario, `format:check` e
+`git diff --check` passaram, e a revisao final confirmou a branch
+`feature/003-api-bootstrap` com somente o escopo esperado.
+
+## Diagnosticar a falha ao iniciar a API localmente
+
+```bash
+docker compose ps
+docker compose logs --tail=80 postgres
+cd apps/api
+SPRING_PROFILES_ACTIVE=local \
+  ./mvnw --batch-mode --no-transfer-progress spring-boot:run
+```
+
+Objetivo: reproduzir a falha relatada e identificar se sua origem estava no
+PostgreSQL, no perfil local ou na inicializacao do Spring Boot.
+
+Resultado: a API ativou corretamente o perfil `local`, mas o Flyway nao
+conseguiu autenticar o usuario `code_arena` no PostgreSQL. O Compose nao mostrou
+o servico do projeto em execucao.
+
+## Identificar o processo que ocupa a porta do PostgreSQL
+
+```bash
+docker compose ps --all
+docker ps \
+  --filter publish=5432 \
+  --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+ss -ltnp 'sport = :5432'
+compgen -e | rg '^DB_(URL|USERNAME|PASSWORD)$' || true
+```
+
+Objetivo: verificar o estado do container, descobrir quem escutava na porta
+`5432` e detectar sobrescritas por variaveis de ambiente sem revelar valores.
+
+Resultado: o container `code-arena-postgres-1` permaneceu no estado `Created`,
+nenhum container publicou a porta `5432` e um PostgreSQL externo ao Compose
+escutava em `127.0.0.1:5432`. Nao havia variaveis `DB_*` sobrescrevendo a
+configuracao local.
+
+## Localizar referencias a porta do PostgreSQL
+
+```bash
+rg -n -C 3 '5432|DB_URL' \
+  compose.yaml \
+  apps/api/src/main/resources/application-local.yml \
+  apps/api/README.md \
+  README.md \
+  docs
+git status --short --branch
+```
+
+Objetivo: identificar todos os locais que precisavam acompanhar a mudanca da
+porta externa do PostgreSQL e reconfirmar o escopo pendente.
+
+Resultado: a porta aparecia no Compose, no perfil local e no diagrama de
+arquitetura. O README da API descrevia as variaveis, mas ainda nao explicitava a
+porta. A configuracao foi ajustada para publicar `5433` no host e preservar
+`5432` dentro do container.
+
+## Recriar o PostgreSQL na porta externa 5433
+
+```bash
+docker compose up -d --wait postgres
+docker compose ps
+docker compose logs --tail=40 postgres
+```
+
+Objetivo: aplicar a nova publicacao de porta, aguardar o healthcheck e inspecionar
+a inicializacao do banco.
+
+Resultado: o Compose recriou o container, que ficou saudavel e publicou
+`0.0.0.0:5433` para a porta interna `5432`. O PostgreSQL informou que estava
+pronto para aceitar conexoes.
+
+## Iniciar a API com o perfil local
+
+```bash
+cd apps/api
+SPRING_PROFILES_ACTIVE=local \
+  ./mvnw --batch-mode --no-transfer-progress spring-boot:run
+```
+
+Objetivo: comprovar a inicializacao completa da aplicacao contra o PostgreSQL do
+Compose.
+
+Resultado: o Flyway conectou em
+`jdbc:postgresql://localhost:5433/code_arena`, o Hibernate inicializou e o Tomcat
+passou a aceitar requisicoes na porta `8080`.
+
+## Verificar os endpoints locais
+
+```bash
+curl --fail --silent --show-error \
+  http://localhost:8080/actuator/health
+curl --fail --silent --show-error \
+  http://localhost:8080/actuator/prometheus |
+sed -n '1,12p'
+```
+
+Objetivo: confirmar a saude da aplicacao e a exposicao de metricas Prometheus
+durante uma execucao local real.
+
+Resultado: o health respondeu com status `UP`, e o endpoint Prometheus retornou
+metricas da aplicacao. O processo Spring Boot foi encerrado com `Ctrl+C` e
+concluiu o graceful shutdown com `BUILD SUCCESS`; o PostgreSQL permaneceu ativo.
+
+## Validar a alteracao da porta local
+
+```bash
+npx prettier --write \
+  compose.yaml \
+  apps/api/README.md \
+  apps/api/src/main/resources/application-local.yml \
+  docs/architecture/overview.md \
+  docs/guides/terminal-commands.md
+npm run format:check
+git diff --check
+docker compose config --quiet
+cd apps/api
+./mvnw --batch-mode --no-transfer-progress verify
+cd ../..
+git status --short --branch
+git diff --stat
+```
+
+Objetivo: formatar os arquivos alterados, validar o Compose e repetir toda a
+verificacao automatizada da API antes de propor o commit.
+
+Resultado: os arquivos ja estavam formatados, `format:check`,
+`git diff --check` e a validacao do Compose passaram. O Maven concluiu com
+`BUILD SUCCESS`; os quatro testes da API passaram sem falhas.
+
+## Revisar o escopo depois da correcao local
+
+```bash
+npm run format:check
+git diff --check
+git status --short --branch
+git diff --stat
+git diff --name-status
+```
+
+Objetivo: reconfirmar a qualidade e apresentar o escopo atualizado antes de
+solicitar aprovacao para criar o commit.
+
+Resultado: a formatacao e o whitespace passaram. A branch continuava como
+`feature/003-api-bootstrap`, com a fundacao da API, o Compose, a CI e a
+documentacao relacionada ainda sem commit.
+
+## Criar o commit da fundacao da API
+
+```bash
+git add \
+  .github/workflows/pull-request.yml \
+  README.md \
+  apps/api \
+  compose.yaml \
+  docs/architecture/overview.md \
+  docs/development/continuous-integration.md \
+  docs/guides/github-repository-settings.md \
+  docs/guides/terminal-commands.md \
+  docs/roadmap.md
+git diff --cached --check
+git diff --cached --stat
+git status --short --branch
+git commit -m "feat(api): bootstrap Spring Boot application"
+```
+
+Objetivo: preparar somente o escopo revisado, conferir o diff staged e criar um
+commit Conventional Commits com a fundacao executavel da API.
+
+Resultado: o mantenedor aprovou explicitamente o escopo e a mensagem. O commit
+foi criado inicialmente como `ec219ae`, mas a verificacao staged avisou sobre
+uma linha em branco extra no fim de `SecurityConfiguration.java`.
+
+## Confirmar o commit e inspecionar o aviso de whitespace
+
+```bash
+git status --short --branch
+git log -1 --oneline
+tail -n 8 \
+  apps/api/src/main/java/com/williamrocha/codearena/config/SecurityConfiguration.java
+git show --check --oneline HEAD
+tail -c 32 \
+  apps/api/src/main/java/com/williamrocha/codearena/config/SecurityConfiguration.java |
+od -An -t x1
+```
+
+Objetivo: confirmar o commit criado e determinar precisamente a origem do aviso
+antes de corrigir seu conteudo.
+
+Resultado: a branch ficou limpa no commit `ec219ae`. O `git show --check`
+confirmou uma linha em branco extra no fim do arquivo, e a leitura hexadecimal
+mostrou duas quebras de linha consecutivas (`0a 0a`) depois da ultima chave.
+
+## Corrigir o whitespace no mesmo commit
+
+```bash
+set -e
+npm run format:check
+git diff --check
+cd apps/api
+./mvnw --batch-mode --no-transfer-progress verify
+cd ../..
+git diff --stat
+git diff -- \
+  apps/api/src/main/java/com/williamrocha/codearena/config/SecurityConfiguration.java \
+  docs/guides/terminal-commands.md
+git add \
+  apps/api/src/main/java/com/williamrocha/codearena/config/SecurityConfiguration.java \
+  docs/guides/terminal-commands.md
+git diff --cached --check
+git diff --cached --stat
+git commit --amend --no-edit
+git status --short --branch
+git log -1 --oneline
+git show --check --oneline HEAD
+```
+
+Objetivo: remover apenas a linha extra, validar novamente a entrega e incorporar
+a correcao ao commit ainda nao publicado.
+
+Resultado: o mantenedor aprovou explicitamente o amend. A formatacao,
+`git diff --check`, `git diff --cached --check` e o Maven passaram; os quatro
+testes ficaram verdes. O commit foi reescrito como `7bc1b08`, a branch ficou
+limpa e `git show --check` nao encontrou novos avisos.
+
+## Revisar a posicao do controle de interrupcao
+
+```bash
+rg -n -C 8 \
+  'Validar e publicar a politica|Corrigir o whitespace no mesmo commit|set -e' \
+  docs/guides/terminal-commands.md
+git status --short --branch
+```
+
+Objetivo: investigar uma alteracao documental fora do bloco atual que apareceu
+no diff do amend.
+
+Resultado: a branch estava limpa, mas o `set -e` usado na correcao havia sido
+registrado por engano em uma secao historica. A linha foi movida para o bloco
+correto sem alterar os comandos historicos anteriores.
+
+## Incorporar a correcao final do diario
+
+```bash
+set -e
+npm run format:check
+git diff --check
+git diff --stat
+git diff -- docs/guides/terminal-commands.md
+git add docs/guides/terminal-commands.md
+git diff --cached --check
+git diff --cached --stat
+git commit --amend --no-edit
+git status --short --branch
+git log -1 --oneline
+git show --check --oneline HEAD
+```
+
+Objetivo: validar a movimentacao do comando no diario e incorpora-la ao mesmo
+commit local da fundacao da API.
+
+Resultado: o mantenedor aprovou explicitamente o ultimo amend documental antes
+da execucao. O hash final sera confirmado pelo Git ao fim do bloco.
