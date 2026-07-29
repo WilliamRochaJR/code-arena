@@ -196,8 +196,8 @@ Ao migrar para outro repositorio, recrie e valide:
 - Issues, Pull Requests e labels, quando precisarem ser preservados;
 - webhooks, GitHub Apps e integracoes externas.
 
-Os comandos usados na migracao do Code Arena estao no
-[diario de comandos do terminal](terminal-commands.md).
+Os comandos reutilizaveis de migracao estao no
+[catalogo de Git](terminal-commands/git.md).
 
 ## Checklist
 
