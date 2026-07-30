@@ -52,6 +52,16 @@ Consulte antes de alterar comportamento ou arquitetura:
 - Nunca direcione `feature/*`, `fix/*`, `docs/*`, `chore/*` ou `develop`
   diretamente para `main`; o check `Pull request policy` deve bloquear esse
   fluxo.
+- Antes de fornecer um link para criar Pull Request, determine a base pela
+  politica: `feature/*`, `fix/*`, `docs/*` e `chore/*` usam `develop`;
+  `release/*` e `hotfix/*` usam `main`.
+- Monte o link no formato
+  `https://github.com/<owner>/<repositorio>/compare/<base>...<head>?expand=1` e
+  codifique a `/` da branch de origem como `%2F`. Nunca reutilize o link
+  generico `/pull/new/<branch>` retornado pelo `git push`, pois ele pode escolher
+  `main`.
+- Ao apresentar o link, informe tambem os valores esperados de `base` e
+  `compare` para que o mantenedor os confirme antes de criar o Pull Request.
 - Nunca faca push direto em `main` ou `develop`.
 - Nunca use force push em uma branch compartilhada.
 - Use Conventional Commits com uma intencao por commit.
