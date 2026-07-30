@@ -6,13 +6,21 @@ do usuario.
 
 ## Qualidade de codigo
 
-O frontend participa da estrategia compartilhada do monorepositorio, que combina
-TypeScript, ESLint, Prettier, Vitest, Husky, lint-staged e Commitlint. Essas
-ferramentas atuam em momentos diferentes, desde o desenvolvimento local ate a
-validacao do Pull Request.
+O frontend participa da estrategia compartilhada do monorepositorio. Cada
+ferramenta atua em uma camada diferente:
+
+| Ferramenta  | Responsabilidade                                                         | Quando executa                                                            | Por que usamos                                                                  |
+| ----------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| TypeScript  | Verificar tipos e contratos durante a compilacao                         | No editor, em `typecheck`, no build e na CI                               | Detecta incompatibilidades antes da execucao e torna refatoracoes mais seguras  |
+| ESLint      | Analisar o codigo e aplicar regras de JavaScript, TypeScript e React     | Em `lint`, no pre-commit para arquivos staged e na CI                     | Identifica problemas que o sistema de tipos nao cobre e padroniza boas praticas |
+| Prettier    | Aplicar uma formatacao deterministica                                    | Em `format`, no pre-commit para arquivos staged e em `format:check` na CI | Evita discussoes de estilo e diffs causados apenas por formatacao               |
+| Vitest      | Executar testes unitarios e de componentes                               | Em `test`, durante o desenvolvimento e na CI                              | Valida comportamentos e permite detectar regressoes                             |
+| Husky       | Conectar scripts do projeto aos hooks do Git                             | Durante `git commit`, por meio de `pre-commit` e `commit-msg`             | Automatiza verificacoes rapidas antes que o commit seja criado                  |
+| lint-staged | Executar ESLint e Prettier somente nos arquivos preparados para o commit | No hook `pre-commit`                                                      | Oferece feedback rapido sem executar toda a suite local                         |
+| Commitlint  | Validar a mensagem do commit com Conventional Commits                    | No hook `commit-msg`                                                      | Mantem o historico consistente e preparado para automacoes de release           |
 
 Consulte a [estrategia de qualidade](../../docs/development/code-quality.md) para
-entender o papel de cada ferramenta, quando ela roda e por que foi adotada.
+entender como as validacoes locais, os hooks e a CI se complementam.
 
 ## Responsabilidades
 
@@ -40,14 +48,18 @@ As versoes exatas resolvidas ficam em [`package-lock.json`](../../package-lock.j
 
 ## Bibliotecas planejadas
 
-Estas dependencias ainda nao foram instaladas. Elas serao adicionadas somente na
-entrega que justificar seu uso:
+| Biblioteca            | Finalidade                                  | Instalada | Em uso | Quando sera adicionada                           |
+| --------------------- | ------------------------------------------- | --------- | ------ | ------------------------------------------------ |
+| React Router          | Navegacao e protecao de rotas               | Nao       | Nao    | Quando a aplicacao possuir mais de uma pagina    |
+| TanStack Query        | Cache, sincronizacao e estado remoto        | Nao       | Nao    | Na primeira integracao do frontend com o SDK     |
+| React Hook Form       | Estado e submissao de formularios           | Nao       | Nao    | Na implementacao dos formularios do MVP          |
+| Zod                   | Validacao de dados e schemas no frontend    | Nao       | Nao    | Junto dos formularios que exigirem validacao     |
+| React Testing Library | Testes de componentes pela perspectiva real | Nao       | Nao    | No primeiro componente com comportamento testado |
+| Playwright            | Testes ponta a ponta no navegador           | Nao       | Nao    | Quando existir um fluxo completo e estavel       |
 
-- React Router para navegacao;
-- TanStack Query para estado remoto;
-- React Hook Form e Zod para formularios e validacao;
-- React Testing Library para testes de componentes;
-- Playwright para testes ponta a ponta.
+As colunas `Instalada` e `Em uso` diferenciam uma dependencia presente no
+projeto de uma dependencia realmente adotada pelo codigo. A tabela deve ser
+atualizada na mesma entrega que instalar ou passar a usar cada biblioteca.
 
 ## Comandos
 
@@ -109,4 +121,4 @@ registrada neste documento.
 - [Autenticacao](../../docs/architecture/authentication.md)
 - [Contratos REST](../../docs/api/contracts.md)
 - [Decisoes arquitetonicas](../../docs/decisions/README.md)
-- [Referencia de comandos](../../docs/guides/command-reference.md)
+- [Catalogo de comandos](../../docs/guides/terminal-commands/README.md)
