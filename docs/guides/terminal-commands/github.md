@@ -62,11 +62,19 @@ bash .github/scripts/validate-pull-request-branch.sh <base> <origem>
 `bash -n` valida sintaxe. Os scripts testam direcoes como
 `release/1.0.0 -> main`.
 
-## Montar o link de um Pull Request para develop
+## Montar o link de um Pull Request
 
 ```text
-https://github.com/<owner>/<repositorio>/compare/develop...<branch>?expand=1
+https://github.com/<owner>/<repositorio>/compare/<base>...<branch-codificada>?expand=1
 ```
 
-O link generico do push pode usar `main`. Features do Code Arena usam `develop`
-como base.
+Escolha `develop` para `feature/*`, `fix/*`, `docs/*` e `chore/*`; escolha
+`main` para `release/*` e `hotfix/*`. Codifique a `/` da branch como `%2F`:
+
+```text
+docs/011-web-readme-quality -> docs%2F011-web-readme-quality
+```
+
+O link generico `/pull/new/<branch>` retornado pelo push pode selecionar `main`
+por ser a branch padrao. Ao abrir a comparacao, confirme visualmente os campos
+`base` e `compare` antes de criar o Pull Request.
