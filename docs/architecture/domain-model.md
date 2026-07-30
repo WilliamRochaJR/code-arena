@@ -245,7 +245,8 @@ Constraints e indices:
 - FK composta `(question_id, selected_alternative_id)` para
   `alternatives(question_id, id)`, garantindo que a alternativa pertence a
   questao respondida;
-- indice em `(attempt_id, position)` para carregar a tentativa em ordem.
+- a unique de `(attempt_id, position)` tambem fornece o indice para carregar a
+  tentativa em ordem.
 
 O campo `correct` permanece nulo enquanto a tentativa esta em andamento. Como
 uma constraint de linha nao consulta o status da tabela pai, a aplicacao garante
