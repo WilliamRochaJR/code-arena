@@ -78,6 +78,16 @@ Os controllers e DTOs REST permanecem separados das entidades JPA. Respostas
 corretas e explicacoes nunca devem ser incluidas nos contratos de tentativas em
 andamento.
 
+## Endpoints implementados
+
+| Metodo | Caminho              | Finalidade                         |
+| ------ | -------------------- | ---------------------------------- |
+| `GET`  | `/api/v1/categories` | Lista as categorias ativas do quiz |
+
+Os endpoints de tentativas documentados em
+[`docs/api/contracts.md`](../../docs/api/contracts.md) permanecem planejados
+para os proximos incrementos da Entrega 5.
+
 ## Persistencia do quiz
 
 O Flyway aplica as migrations em ordem ao iniciar a aplicacao:
