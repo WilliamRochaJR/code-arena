@@ -1,18 +1,37 @@
 # Arquivos e ambiente
 
+## Mostrar o diretorio atual
+
+```bash
+pwd
+```
+
+Confirma em qual diretorio os proximos comandos serao executados.
+
 ## Localizar arquivos e texto
 
 ```bash
 rg --files <diretorios>
 rg -n -C <linhas-de-contexto> "<padrao>" <arquivos-ou-diretorios>
+find <diretorio> -maxdepth <niveis> -type f -print
 sed -n '<inicio>,<fim>p' <arquivo>
 tail -n <quantidade> <arquivo>
 ```
 
 - `rg --files` lista arquivos e respeita regras como `.gitignore`.
 - `rg -n` pesquisa texto, mostra numeros de linha e adiciona contexto com `-C`.
+- `find` permite filtrar por tipo e limitar a profundidade da arvore.
 - `sed -n` le somente um intervalo.
 - `tail` mostra as ultimas linhas, sendo util para logs.
+
+## Contar linhas
+
+```bash
+wc -l <arquivos>
+```
+
+Mostra o numero de linhas por arquivo e o total quando recebe varios caminhos.
+Ajuda a revisar o tamanho de um escopo, mas nao mede sozinho sua complexidade.
 
 ## Localizar um executavel
 

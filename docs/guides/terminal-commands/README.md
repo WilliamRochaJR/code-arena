@@ -22,6 +22,8 @@ assunto correspondente.
 - [JavaScript e TypeScript](javascript.md)
 - [Java e Spring Boot](java-spring.md)
 - [Docker e servicos locais](docker-and-services.md)
+- [PostgreSQL e Flyway](postgresql-and-flyway.md)
+- [Testes e diagnostico](testing-and-diagnostics.md)
 
 Este catalogo explica comandos reutilizaveis. Guias como
 [Git workflow](../git-workflow.md) explicam quando aplica-los em um processo

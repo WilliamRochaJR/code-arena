@@ -26,6 +26,7 @@ necessarios para compreender e reproduzir o projeto.
 - [ADR 0002: usar Git Flow simplificado](decisions/0002-use-simplified-git-flow.md)
 - [ADR 0003: manter o repositorio privado durante o desenvolvimento](decisions/0003-keep-repository-private-during-development.md)
 - [ADR 0004: usar Semantic Versioning e tags anotadas](decisions/0004-use-semantic-versioning.md)
+- [ADR 0005: preservar o historico das tentativas sem snapshots](decisions/0005-preserve-quiz-attempt-history.md)
 
 ## Guias
 
@@ -33,6 +34,7 @@ necessarios para compreender e reproduzir o projeto.
 - [Fluxo de trabalho com Git](guides/git-workflow.md)
 - [Configuracao do repositorio no GitHub](guides/github-repository-settings.md)
 - [Versionamento, releases e tags](guides/versioning-and-releases.md)
+- [Relacionamentos de banco e JPA](guides/database-relationships-and-jpa.md)
 - [Catalogo de comandos do terminal](guides/terminal-commands/README.md)
 
 ## Desenvolvimento
