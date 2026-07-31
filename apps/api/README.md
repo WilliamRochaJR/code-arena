@@ -67,6 +67,21 @@ ser implementada.
 Logs usam SLF4J com Logback e sao escritos no console. Tokens, credenciais e
 outros dados sensiveis nao devem ser registrados.
 
+## Persistencia do quiz
+
+O Flyway aplica as migrations em ordem ao iniciar a aplicacao:
+
+| Migration                        | Estado | Finalidade                                      |
+| -------------------------------- | ------ | ----------------------------------------------- |
+| `V1__create_quiz_schema.sql`     | Em uso | Cria tabelas, relacionamentos, indices e regras |
+| `V2__seed_java_quiz_catalog.sql` | Em uso | Carrega o catalogo inicial de perguntas Java    |
+
+O catalogo inicial possui tres categorias (`OOP`, `COLLECTIONS` e `STREAMS`),
+36 questoes e 144 alternativas. Cada uma das tres dificuldades possui opcoes
+suficientes para montar um questionario de dez questoes em qualquer categoria.
+Os identificadores sao deterministas para que o mesmo catalogo seja criado em
+todos os ambientes.
+
 ## Testes e build
 
 ```bash

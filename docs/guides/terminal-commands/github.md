@@ -29,6 +29,16 @@ gh pr view <numero-ou-branch> \
 
 Sao consultas de metadados, base, origem, estado de merge e checks.
 
+## Consultar Issues
+
+```bash
+gh issue view <numero> \
+  --repo <owner>/<repositorio> \
+  --json title,body,state,url
+```
+
+Consulta o escopo, os criterios e o estado de uma Issue sem altera-la.
+
 ## Consultar Actions
 
 ```bash

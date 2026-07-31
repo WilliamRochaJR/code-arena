@@ -303,9 +303,16 @@ atomica.
 
 ## Estrategia inicial de dados
 
-Categorias, questoes, associacoes e alternativas iniciais serao carregadas por
-uma migration de seed separada da migration estrutural. Os identificadores do
-seed sao estaveis para tornar testes e ambientes reproduziveis.
+Categorias, questoes, associacoes e alternativas iniciais sao carregadas pela
+migration `V2__seed_java_quiz_catalog.sql`, separada da migration estrutural.
+Os identificadores do seed sao estaveis para tornar testes e ambientes
+reproduziveis.
+
+O catalogo inicial contem 36 questoes, divididas igualmente entre os niveis
+`BEGINNER`, `INTERMEDIATE` e `ADVANCED`, com quatro alternativas e exatamente
+uma resposta correta por questao. As associacoes entre questoes e as categorias
+`OOP`, `COLLECTIONS` e `STREAMS` garantem pelo menos dez questoes elegiveis para
+cada combinacao entre categoria e dificuldade.
 
 Um painel administrativo fica fora do MVP. Ate que exista um fluxo de
 versionamento de conteudo, questoes publicadas sao tratadas como imutaveis:

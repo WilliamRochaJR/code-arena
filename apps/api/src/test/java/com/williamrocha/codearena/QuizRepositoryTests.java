@@ -76,13 +76,28 @@ class QuizRepositoryTests {
 	void listsOnlyActiveCategoriesOrderedByName() {
 		categoryRepository.save(new Category("streams", "Streams"));
 		categoryRepository.save(new Category("collections", "Collections"));
+		Category inactive = categoryRepository.save(
+			new Category("inactive", "Inactive"));
+		entityManager.flush();
+		entityManager.createNativeQuery("""
+			UPDATE categories
+			SET active = FALSE
+			WHERE id = :id
+			""")
+			.setParameter("id", inactive.getId())
+			.executeUpdate();
+		entityManager.clear();
 
 		List<Category> categories =
 			categoryRepository.findAllByActiveTrueOrderByNameAsc();
 
 		assertThat(categories)
+			.extracting(Category::getName)
+			.isSorted();
+		assertThat(categories)
 			.extracting(Category::getSlug)
-			.containsExactly("collections", "streams");
+			.contains("collections", "streams")
+			.doesNotContain("inactive");
 	}
 
 	@Test
