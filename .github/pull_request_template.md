@@ -36,5 +36,7 @@
 - [ ] Atualizei ou adicionei testes aplicaveis.
 - [ ] Executei formatacao, lint, typecheck, testes e build aplicaveis.
 - [ ] Atualizei README, guias, contratos ou ADRs quando necessario.
+- [ ] Revisei os comandos usados e atualizei o catalogo tematico quando necessario.
+- [ ] Documentei conceitos tecnicos novos que precisam servir como material de estudo.
 - [ ] Nao inclui segredos, credenciais ou dados sensiveis.
 - [ ] Mantive a alteracao pequena e relacionada ao objetivo.

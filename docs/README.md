@@ -34,6 +34,7 @@ necessarios para compreender e reproduzir o projeto.
 - [Fluxo de trabalho com Git](guides/git-workflow.md)
 - [Configuracao do repositorio no GitHub](guides/github-repository-settings.md)
 - [Versionamento, releases e tags](guides/versioning-and-releases.md)
+- [Relacionamentos de banco e JPA](guides/database-relationships-and-jpa.md)
 - [Catalogo de comandos do terminal](guides/terminal-commands/README.md)
 
 ## Desenvolvimento

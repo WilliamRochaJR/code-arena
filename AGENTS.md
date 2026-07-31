@@ -142,6 +142,15 @@ do Pull Request.
   comando uma unica vez no arquivo tematico adequado.
 - Nunca registre valores sensiveis. Use placeholders para URLs, identificadores
   e valores que variam.
+- Antes de propor qualquer commit, revise os comandos executados durante a
+  tarefa e informe ao mantenedor quais comandos reutilizaveis foram adicionados
+  ao catalogo. Quando nenhum comando novo precisar ser registrado, declare isso
+  explicitamente e explique brevemente por que os comandos ja estavam
+  catalogados ou eram apenas leituras ocasionais.
+- Quando uma entrega introduzir um conceito tecnico relevante que ainda nao
+  esteja explicado para estudo, atualize ou crie um guia tematico. Para
+  persistencia, considere relacionamentos, constraints, migrations e
+  mapeamentos JPA.
 - Registre decisoes arquiteturais relevantes em um ADR dentro de
   `docs/decisions/`.
 - Diferencie claramente estado implementado, decisao atual e trabalho planejado.

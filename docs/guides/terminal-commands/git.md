@@ -22,6 +22,17 @@ git log --oneline --decorate --graph --all --max-count=<quantidade>
 
 Sao consultas de branch atual, upstream, remotes e commits recentes.
 
+## Comparar commits entre referencias
+
+```bash
+git log --oneline <base>..HEAD
+git log --oneline --name-status <base>..HEAD
+```
+
+Lista commits existentes na branch atual e ausentes na referencia base. A
+segunda forma tambem mostra os arquivos adicionados, modificados ou removidos em
+cada commit.
+
 ## Sincronizar referencias
 
 ```bash
