@@ -93,6 +93,10 @@ producao e nao aceita identidade enviada por cabecalhos. Na integracao com
 Cognito, uma nova implementacao de `CurrentUserProvider` usara as claims
 validadas do access token sem alterar os servicos de negocio.
 
+O `CurrentUserService` resolve a identidade fornecida e cria o `AppUser` na
+primeira operacao que precisa de um usuario persistido. Resolucoes seguintes
+reutilizam o registro pelo `subject`, que permanece a chave externa estavel.
+
 ## Cuidados
 
 - Nao registrar tokens, authorization codes ou credenciais.
