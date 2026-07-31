@@ -39,6 +39,25 @@ gh issue view <numero> \
 
 Consulta o escopo, os criterios e o estado de uma Issue sem altera-la.
 
+## Criar e concluir Issues
+
+```bash
+gh issue create \
+  --repo <owner>/<repositorio> \
+  --title "<titulo>" \
+  --label <label> \
+  --body-file <arquivo-ou-entrada-padrao>
+
+gh issue close <numero> \
+  --repo <owner>/<repositorio> \
+  --reason completed \
+  --comment "<resumo-da-entrega>"
+```
+
+O primeiro cria uma Issue a partir de uma descricao preparada. O segundo
+registra a entrega e conclui manualmente uma Issue quando o fluxo por `develop`
+nao aciona o fechamento automatico da branch padrao.
+
 ## Consultar Actions
 
 ```bash

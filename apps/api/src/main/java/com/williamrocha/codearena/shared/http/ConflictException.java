@@ -1,0 +1,14 @@
+package com.williamrocha.codearena.shared.http;
+
+import org.springframework.http.HttpStatus;
+
+public class ConflictException extends ApiException {
+
+	public ConflictException(String detail) {
+		super(
+			HttpStatus.CONFLICT,
+			"conflict",
+			"Conflito de estado",
+			detail);
+	}
+}

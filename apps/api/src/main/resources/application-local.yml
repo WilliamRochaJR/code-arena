@@ -7,3 +7,10 @@ spring:
 logging:
   level:
     com.williamrocha.codearena: DEBUG
+
+code-arena:
+  identity:
+    controlled:
+      display-name: ${CONTROLLED_USER_DISPLAY_NAME:Local Developer}
+      email: ${CONTROLLED_USER_EMAIL:developer@localhost}
+      subject: ${CONTROLLED_USER_SUBJECT:local-development-user}

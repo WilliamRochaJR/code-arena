@@ -83,9 +83,15 @@ melhoram a navegacao, mas nao constituem controle de seguranca.
 ## Desenvolvimento local
 
 A integracao real com Cognito sera adicionada depois que o dominio do quiz
-funcionar. Ate la, um perfil de desenvolvimento/teste podera fornecer uma
-identidade controlada. Esse mecanismo deve ficar desabilitado em producao e nao
-aceitar cabecalhos arbitrarios quando o perfil seguro estiver ativo.
+funcionar. Nos perfis `local` e `test`, a API fornece uma identidade controlada
+pela abstracao `CurrentUserProvider` e permite acesso a `/api/v1/**` sem token.
+Os valores locais podem ser substituidos por `CONTROLLED_USER_SUBJECT`,
+`CONTROLLED_USER_EMAIL` e `CONTROLLED_USER_DISPLAY_NAME`.
+
+Esse mecanismo nao e carregado no perfil padrao, permanece desabilitado em
+producao e nao aceita identidade enviada por cabecalhos. Na integracao com
+Cognito, uma nova implementacao de `CurrentUserProvider` usara as claims
+validadas do access token sem alterar os servicos de negocio.
 
 ## Cuidados
 
