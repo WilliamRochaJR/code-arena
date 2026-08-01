@@ -15,12 +15,17 @@ Cria o repositorio com `main` e registra o remote `origin`.
 
 ```bash
 git status --short --branch
+git branch --show-current
 git branch -vv
+git remote get-url origin
 git remote -v
 git log --oneline --decorate --graph --all --max-count=<quantidade>
 ```
 
 Sao consultas de branch atual, upstream, remotes e commits recentes.
+`git branch --show-current` retorna somente o nome da branch, enquanto
+`git remote get-url origin` retorna somente a URL usada pelo remote informado.
+Essas formas sao uteis para confirmar o destino antes de um push.
 
 ## Comparar commits entre referencias
 
