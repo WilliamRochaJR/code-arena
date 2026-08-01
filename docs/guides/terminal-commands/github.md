@@ -39,6 +39,16 @@ gh issue view <numero> \
 
 Consulta o escopo, os criterios e o estado de uma Issue sem altera-la.
 
+Se a versao instalada do GitHub CLI falhar ao consultar campos descontinuados,
+use a API REST somente leitura:
+
+```bash
+gh api repos/<owner>/<repositorio>/issues/<numero> \
+  --jq '{title, state, body, html_url}'
+```
+
+A alternativa retorna apenas os campos necessarios e nao altera a Issue.
+
 ## Criar e concluir Issues
 
 ```bash
