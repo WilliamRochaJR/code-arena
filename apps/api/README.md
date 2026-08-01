@@ -86,6 +86,7 @@ andamento.
 | `POST` | `/api/v1/quiz-attempts`                                  | Cria uma tentativa com dez questoes       |
 | `GET`  | `/api/v1/quiz-attempts/{attemptId}`                      | Consulta o progresso da propria tentativa |
 | `PUT`  | `/api/v1/quiz-attempts/{attemptId}/answers/{questionId}` | Cria ou substitui uma resposta            |
+| `POST` | `/api/v1/quiz-attempts/{attemptId}/completion`           | Conclui, corrige e calcula o resultado    |
 
 Os demais endpoints de tentativas documentados em
 [`docs/api/contracts.md`](../../docs/api/contracts.md) permanecem planejados
@@ -97,7 +98,7 @@ O Flyway aplica as migrations em ordem ao iniciar a aplicacao:
 
 | Migration                        | Estado | Finalidade                                      |
 | -------------------------------- | ------ | ----------------------------------------------- |
-| `V1__create_quiz_schema.sql`     | Em uso | Cria tabelas, relacionamentos, indices e regras |
+| `V1__create_quiz_domain.sql`     | Em uso | Cria tabelas, relacionamentos, indices e regras |
 | `V2__seed_java_quiz_catalog.sql` | Em uso | Carrega o catalogo inicial de perguntas Java    |
 
 O catalogo inicial possui tres categorias (`OOP`, `COLLECTIONS` e `STREAMS`),

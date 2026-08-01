@@ -97,4 +97,19 @@ public class QuizAttempt {
 	public OffsetDateTime getCompletedAt() {
 		return completedAt;
 	}
+
+	public void complete(
+		short correctAnswers,
+		BigDecimal score,
+		OffsetDateTime completedAt
+	) {
+		if (status == QuizAttemptStatus.COMPLETED) {
+			return;
+		}
+
+		this.status = QuizAttemptStatus.COMPLETED;
+		this.correctAnswers = correctAnswers;
+		this.score = score;
+		this.completedAt = completedAt;
+	}
 }
