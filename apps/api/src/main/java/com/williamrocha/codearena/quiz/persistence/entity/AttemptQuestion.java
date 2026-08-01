@@ -96,4 +96,14 @@ public class AttemptQuestion {
 	public OffsetDateTime getAnsweredAt() {
 		return answeredAt;
 	}
+
+	public void answerWith(UUID alternativeId, OffsetDateTime answeredAt) {
+		if (alternativeId.equals(selectedAlternativeId)) {
+			return;
+		}
+
+		this.selectedAlternativeId = alternativeId;
+		this.selectedAlternative = null;
+		this.answeredAt = answeredAt;
+	}
 }

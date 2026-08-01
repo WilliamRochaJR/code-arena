@@ -80,11 +80,12 @@ andamento.
 
 ## Endpoints implementados
 
-| Metodo | Caminho                             | Finalidade                                |
-| ------ | ----------------------------------- | ----------------------------------------- |
-| `GET`  | `/api/v1/categories`                | Lista as categorias ativas do quiz        |
-| `POST` | `/api/v1/quiz-attempts`             | Cria uma tentativa com dez questoes       |
-| `GET`  | `/api/v1/quiz-attempts/{attemptId}` | Consulta o progresso da propria tentativa |
+| Metodo | Caminho                                                  | Finalidade                                |
+| ------ | -------------------------------------------------------- | ----------------------------------------- |
+| `GET`  | `/api/v1/categories`                                     | Lista as categorias ativas do quiz        |
+| `POST` | `/api/v1/quiz-attempts`                                  | Cria uma tentativa com dez questoes       |
+| `GET`  | `/api/v1/quiz-attempts/{attemptId}`                      | Consulta o progresso da propria tentativa |
+| `PUT`  | `/api/v1/quiz-attempts/{attemptId}/answers/{questionId}` | Cria ou substitui uma resposta            |
 
 Os demais endpoints de tentativas documentados em
 [`docs/api/contracts.md`](../../docs/api/contracts.md) permanecem planejados
