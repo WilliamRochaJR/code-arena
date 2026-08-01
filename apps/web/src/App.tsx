@@ -1,121 +1,157 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useQuery } from '@tanstack/react-query'
+import type { JavaQuizClient } from '@code-arena/java-quiz-sdk'
+
+import { javaQuizClient } from './api/java-quiz-client'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+interface AppProps {
+  client?: JavaQuizClient
+}
+
+function App({ client = javaQuizClient }: AppProps) {
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const categoriesQuery = useQuery({
+    queryKey: ['categories'],
+    queryFn: ({ signal }) => client.categories.list({ signal }),
+  })
+
+  function toggleCategory(slug: string) {
+    setSelectedCategories((current) =>
+      current.includes(slug)
+        ? current.filter((category) => category !== slug)
+        : [...current, slug],
+    )
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
+    <div className="app-shell">
+      <header className="topbar">
+        <a className="brand" href="/" aria-label="Code Arena - início">
+          <span className="brand-mark" aria-hidden="true">
+            {'</>'}
+          </span>
+          <span>Code Arena</span>
+        </a>
+        <span className="step-label">Configuração do quiz</span>
+      </header>
+
+      <main className="main-content">
+        <section className="intro" aria-labelledby="page-title">
+          <span className="eyebrow">Desafio Java</span>
+          <h1 id="page-title">Quais temas você quer praticar?</h1>
           <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+            Escolha uma ou mais categorias. Vamos preparar dez questões para o
+            seu próximo treino.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+        </section>
 
-      <div className="ticks"></div>
+        <section className="category-panel" aria-labelledby="category-title">
+          <div className="panel-heading">
+            <div>
+              <span className="step-number">01</span>
+              <h2 id="category-title">Selecione as categorias</h2>
+            </div>
+            <span className="selection-count" aria-live="polite">
+              {selectedCategories.length}{' '}
+              {selectedCategories.length === 1 ? 'selecionada' : 'selecionadas'}
+            </span>
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          {categoriesQuery.isPending && (
+            <div className="status-card" role="status">
+              <span className="spinner" aria-hidden="true" />
+              <div>
+                <strong>Carregando categorias</strong>
+                <p>Consultando os temas disponíveis na arena...</p>
+              </div>
+            </div>
+          )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+          {categoriesQuery.isError && (
+            <div className="status-card status-card--error" role="alert">
+              <span className="status-icon" aria-hidden="true">
+                !
+              </span>
+              <div>
+                <strong>Não foi possível carregar as categorias</strong>
+                <p>Confira se a API está em execução e tente novamente.</p>
+                <button
+                  className="text-button"
+                  type="button"
+                  onClick={() => void categoriesQuery.refetch()}
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            </div>
+          )}
+
+          {categoriesQuery.isSuccess &&
+            categoriesQuery.data.items.length === 0 && (
+              <div className="status-card" role="status">
+                <span className="status-icon" aria-hidden="true">
+                  —
+                </span>
+                <div>
+                  <strong>Nenhuma categoria disponível</strong>
+                  <p>Novos temas serão publicados em breve.</p>
+                </div>
+              </div>
+            )}
+
+          {categoriesQuery.isSuccess &&
+            categoriesQuery.data.items.length > 0 && (
+              <fieldset className="category-grid">
+                <legend className="sr-only">Categorias disponíveis</legend>
+                {categoriesQuery.data.items.map((category, index) => {
+                  const selected = selectedCategories.includes(category.slug)
+                  return (
+                    <label
+                      className={`category-card${selected ? ' category-card--selected' : ''}`}
+                      key={category.slug}
+                    >
+                      <input
+                        checked={selected}
+                        onChange={() => toggleCategory(category.slug)}
+                        type="checkbox"
+                        value={category.slug}
+                      />
+                      <span className="category-index" aria-hidden="true">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <span className="category-copy">
+                        <strong>{category.name}</strong>
+                        <small>{category.slug}</small>
+                      </span>
+                      <span className="check-mark" aria-hidden="true">
+                        ✓
+                      </span>
+                    </label>
+                  )
+                })}
+              </fieldset>
+            )}
+
+          <div className="panel-footer">
+            <p>Você poderá ajustar a dificuldade no próximo passo.</p>
+            <button
+              className="primary-button"
+              type="button"
+              disabled={selectedCategories.length === 0}
+            >
+              Continuar
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer className="footer">
+        <span>© 2026 Code Arena</span>
+        <span>Aprenda. Pratique. Evolua.</span>
+      </footer>
+    </div>
   )
 }
 
