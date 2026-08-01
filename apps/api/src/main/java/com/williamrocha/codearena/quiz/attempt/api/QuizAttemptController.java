@@ -8,14 +8,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.williamrocha.codearena.quiz.attempt.application.CreatedQuizAttempt;
-import com.williamrocha.codearena.quiz.attempt.application.QuizAttemptDetails;
+import com.williamrocha.codearena.quiz.attempt.application.QuizAttemptAnswerService;
 import com.williamrocha.codearena.quiz.attempt.application.QuizAttemptCreationService;
+import com.williamrocha.codearena.quiz.attempt.application.QuizAttemptDetails;
 import com.williamrocha.codearena.quiz.attempt.application.QuizAttemptQueryService;
+import com.williamrocha.codearena.quiz.attempt.application.SavedQuizAnswer;
 
 import jakarta.validation.Valid;
 
@@ -26,13 +29,33 @@ public class QuizAttemptController {
 
 	private final QuizAttemptCreationService creationService;
 	private final QuizAttemptQueryService queryService;
+	private final QuizAttemptAnswerService answerService;
 
 	public QuizAttemptController(
 		QuizAttemptCreationService creationService,
-		QuizAttemptQueryService queryService
+		QuizAttemptQueryService queryService,
+		QuizAttemptAnswerService answerService
 	) {
 		this.creationService = creationService;
 		this.queryService = queryService;
+		this.answerService = answerService;
+	}
+
+	@PutMapping("/{attemptId}/answers/{questionId}")
+	SaveQuizAnswerResponse saveAnswer(
+		@PathVariable UUID attemptId,
+		@PathVariable UUID questionId,
+		@Valid @RequestBody SaveQuizAnswerRequest request
+	) {
+		SavedQuizAnswer saved = answerService.save(
+			attemptId,
+			questionId,
+			request.selectedAlternativeId());
+
+		return new SaveQuizAnswerResponse(
+			saved.questionId(),
+			saved.selectedAlternativeId(),
+			saved.answeredAt());
 	}
 
 	@GetMapping("/{attemptId}")
