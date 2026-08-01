@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.williamrocha.codearena.quiz.attempt.application.CreatedQuizAttempt;
 import com.williamrocha.codearena.quiz.attempt.application.QuizAttemptAnswerService;
 import com.williamrocha.codearena.quiz.attempt.application.QuizAttemptCreationService;
+import com.williamrocha.codearena.quiz.attempt.application.QuizAttemptCompletionService;
+import com.williamrocha.codearena.quiz.attempt.application.CompletedQuizAttempt;
 import com.williamrocha.codearena.quiz.attempt.application.QuizAttemptDetails;
 import com.williamrocha.codearena.quiz.attempt.application.QuizAttemptQueryService;
 import com.williamrocha.codearena.quiz.attempt.application.SavedQuizAnswer;
@@ -30,15 +32,25 @@ public class QuizAttemptController {
 	private final QuizAttemptCreationService creationService;
 	private final QuizAttemptQueryService queryService;
 	private final QuizAttemptAnswerService answerService;
+	private final QuizAttemptCompletionService completionService;
 
 	public QuizAttemptController(
 		QuizAttemptCreationService creationService,
 		QuizAttemptQueryService queryService,
-		QuizAttemptAnswerService answerService
+		QuizAttemptAnswerService answerService,
+		QuizAttemptCompletionService completionService
 	) {
 		this.creationService = creationService;
 		this.queryService = queryService;
 		this.answerService = answerService;
+		this.completionService = completionService;
+	}
+
+	@PostMapping("/{attemptId}/completion")
+	CompleteQuizAttemptResponse complete(@PathVariable UUID attemptId) {
+		CompletedQuizAttempt completed = completionService.complete(attemptId);
+
+		return CompleteQuizAttemptResponse.from(completed);
 	}
 
 	@PutMapping("/{attemptId}/answers/{questionId}")

@@ -106,4 +106,8 @@ public class AttemptQuestion {
 		this.selectedAlternative = null;
 		this.answeredAt = answeredAt;
 	}
+
+	public void markCorrect(boolean correct) {
+		this.correct = correct;
+	}
 }
