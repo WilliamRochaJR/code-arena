@@ -14,9 +14,10 @@ nem use `fetch` diretamente.
 
 ## Estado implementado
 
-| Recurso    | Operacao            | Endpoint                 | Estado |
-| ---------- | ------------------- | ------------------------ | ------ |
-| Categorias | `categories.list()` | `GET /api/v1/categories` | Em uso |
+| Recurso    | Operacao            | Endpoint                     | Estado |
+| ---------- | ------------------- | ---------------------------- | ------ |
+| Categorias | `categories.list()` | `GET /api/v1/categories`     | Em uso |
+| Tentativas | `attempts.create()` | `POST /api/v1/quiz-attempts` | Em uso |
 
 ## Uso
 
@@ -29,6 +30,15 @@ const client = createJavaQuizClient({
 })
 
 const { items } = await client.categories.list()
+```
+
+Para criar uma tentativa:
+
+```ts
+const attempt = await client.attempts.create({
+  difficulty: 'INTERMEDIATE',
+  categories: ['OOP', 'COLLECTIONS'],
+})
 ```
 
 O `tokenProvider` e opcional para permitir o perfil local com identidade

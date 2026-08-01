@@ -11,6 +11,9 @@ function createClient(result: Promise<CategoryList>): JavaQuizClient {
     categories: {
       list: vi.fn(() => result),
     },
+    attempts: {
+      create: vi.fn<JavaQuizClient['attempts']['create']>(),
+    },
   }
 }
 
@@ -82,7 +85,12 @@ describe('App', () => {
       .fn<JavaQuizClient['categories']['list']>()
       .mockRejectedValueOnce(new Error('offline'))
       .mockResolvedValueOnce({ items: [{ slug: 'OOP', name: 'OOP' }] })
-    renderApp({ categories: { list } })
+    renderApp({
+      categories: { list },
+      attempts: {
+        create: vi.fn<JavaQuizClient['attempts']['create']>(),
+      },
+    })
 
     expect(
       await screen.findByText('Não foi possível carregar as categorias'),

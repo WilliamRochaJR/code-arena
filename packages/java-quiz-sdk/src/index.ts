@@ -10,9 +10,13 @@ export {
 export type {
   Category,
   CategoryList,
+  CreateQuizAttemptOptions,
+  CreateQuizAttemptRequest,
   JavaQuizClient,
   JavaQuizClientOptions,
   ListCategoriesOptions,
   ProblemDetail,
+  QuizAttemptSummary,
+  QuizDifficulty,
   TokenProvider,
 } from './types.js'

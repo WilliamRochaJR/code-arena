@@ -59,6 +59,62 @@ describe('createJavaQuizClient', () => {
     })
   })
 
+  it('creates a quiz attempt with a JSON body', async () => {
+    const attempt = {
+      id: 'df34978a-2024-4234-9ba8-1af6cf7af994',
+      status: 'IN_PROGRESS' as const,
+      difficulty: 'INTERMEDIATE' as const,
+      categories: ['OOP', 'COLLECTIONS'],
+      totalQuestions: 10,
+      answeredQuestions: 0,
+      startedAt: '2026-07-22T18:30:00Z',
+    }
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(Response.json(attempt, { status: 201 }))
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      fetch: fetchMock,
+    })
+
+    await expect(
+      client.attempts.create({
+        difficulty: 'INTERMEDIATE',
+        categories: ['OOP', 'COLLECTIONS'],
+      }),
+    ).resolves.toEqual(attempt)
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:8080/api/v1/quiz-attempts',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          difficulty: 'INTERMEDIATE',
+          categories: ['OOP', 'COLLECTIONS'],
+        }),
+      }),
+    )
+    const request = fetchMock.mock.calls[0]?.[1]
+    expect(new Headers(request?.headers).get('Content-Type')).toBe(
+      'application/json',
+    )
+  })
+
+  it('rejects an invalid quiz attempt response', async () => {
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      fetch: vi
+        .fn<typeof fetch>()
+        .mockResolvedValue(Response.json({ id: 'missing-fields' })),
+    })
+
+    await expect(
+      client.attempts.create({
+        difficulty: 'BEGINNER',
+        categories: ['OOP'],
+      }),
+    ).rejects.toBeInstanceOf(JavaQuizInvalidResponseError)
+  })
+
   it('rejects invalid successful responses', async () => {
     const client = createJavaQuizClient({
       baseUrl: 'http://localhost:8080',
