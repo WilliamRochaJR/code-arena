@@ -90,14 +90,17 @@ O link generico exibido pelo `git push` usa a branch padrao `main` como base. Ao
 criar o PR pela interface, use uma URL de comparacao explicita:
 
 ```text
-https://github.com/WilliamRochaJR/code-arena/compare/develop...<branch-codificada>?expand=1
+https://github.com/WilliamRochaJR/code-arena/compare/develop...<branch-codificada>?expand=1&title=<titulo-codificado>&body=<descricao-codificada>
 ```
 
 Codifique a `/` do nome da branch como `%2F`. Por exemplo,
 `docs/011-web-readme-quality` se torna
 `docs%2F011-web-readme-quality`. O link deve abrir com `base: develop` e
 `compare: docs/011-web-readme-quality`; confirme esses dois campos antes de
-criar o PR.
+criar o PR. Aplique URL encoding ao titulo e a descricao completa para que o
+formulario tambem abra com esses campos preenchidos. A descricao segue
+`.github/pull_request_template.md` e registra somente mudancas e validacoes
+realmente realizadas.
 
 O PR registra objetivo, criterios de aceite, validacoes, riscos e itens fora do
 escopo.
