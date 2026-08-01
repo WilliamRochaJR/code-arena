@@ -62,6 +62,11 @@ Consulte antes de alterar comportamento ou arquitetura:
   `main`.
 - Ao apresentar o link, informe tambem os valores esperados de `base` e
   `compare` para que o mantenedor os confirme antes de criar o Pull Request.
+- Sempre que fornecer um link para criar Pull Request, apresente junto, sem que
+  o mantenedor precise pedir, um titulo sugerido e uma descricao completa pronta
+  para copiar. A descricao deve seguir `.github/pull_request_template.md`, ser
+  baseada no diff e nas validacoes realmente executadas e nao marcar como
+  concluido aquilo que ainda estiver pendente.
 - Nunca faca push direto em `main` ou `develop`.
 - Nunca use force push em uma branch compartilhada.
 - Use Conventional Commits com uma intencao por commit.
