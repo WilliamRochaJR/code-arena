@@ -10,8 +10,8 @@ uma biblioteca de componentes e uma API Java 21 com Spring Boot.
 
 - [Aplicacao web](apps/web/README.md) - React, TypeScript e Vite.
 - [API Spring Boot](apps/api/README.md) - Java 21, Spring Boot e PostgreSQL.
-- SDK TypeScript - scaffold em `packages/java-quiz-sdk`; a documentacao sera
-  adicionada com a implementacao.
+- [Java Quiz SDK](packages/java-quiz-sdk/README.md) - cliente REST TypeScript
+  reutilizavel e independente de React.
 - Biblioteca de UI - scaffold em `packages/ui`; a documentacao sera adicionada
   com os primeiros componentes.
 

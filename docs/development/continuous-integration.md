@@ -66,6 +66,13 @@ validar base e origem         setup Node           setup Java 21
                    format, lint, types, tests, build
 ```
 
+`apps/web` consome `@code-arena/java-quiz-sdk` pelas exportacoes geradas em
+`packages/java-quiz-sdk/dist`. Como `dist` e um artefato ignorado pelo Git e nao
+existe depois de um checkout limpo, os scripts raiz `typecheck`, `test` e `build`
+executam primeiro `npm run build:sdk`. Essa ordem torna cada comando raiz
+reproduzivel na CI sem versionar arquivos gerados nem importar fontes internas
+do SDK diretamente.
+
 Separar os jobs permite distinguir uma violacao do fluxo de branches de uma
 falha de qualidade JavaScript ou Java.
 

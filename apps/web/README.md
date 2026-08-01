@@ -46,16 +46,20 @@ backend.
 
 As versoes exatas resolvidas ficam em [`package-lock.json`](../../package-lock.json).
 
-## Bibliotecas planejadas
+## Bibliotecas instaladas e planejadas
 
-| Biblioteca            | Finalidade                                  | Instalada | Em uso | Quando sera adicionada                           |
-| --------------------- | ------------------------------------------- | --------- | ------ | ------------------------------------------------ |
-| React Router          | Navegacao e protecao de rotas               | Nao       | Nao    | Quando a aplicacao possuir mais de uma pagina    |
-| TanStack Query        | Cache, sincronizacao e estado remoto        | Nao       | Nao    | Na primeira integracao do frontend com o SDK     |
-| React Hook Form       | Estado e submissao de formularios           | Nao       | Nao    | Na implementacao dos formularios do MVP          |
-| Zod                   | Validacao de dados e schemas no frontend    | Nao       | Nao    | Junto dos formularios que exigirem validacao     |
-| React Testing Library | Testes de componentes pela perspectiva real | Nao       | Nao    | No primeiro componente com comportamento testado |
-| Playwright            | Testes ponta a ponta no navegador           | Nao       | Nao    | Quando existir um fluxo completo e estavel       |
+| Biblioteca            | Finalidade                                      | Instalada | Em uso | Estado ou momento de adocao                   |
+| --------------------- | ----------------------------------------------- | --------- | ------ | --------------------------------------------- |
+| Java Quiz SDK         | Cliente REST e contratos TypeScript             | Sim       | Sim    | Listagem de categorias                        |
+| TanStack Query        | Cache, sincronizacao e estado remoto            | Sim       | Sim    | Consulta de categorias                        |
+| React Testing Library | Testes pela perspectiva de quem usa a interface | Sim       | Sim    | Estados e selecao de categorias               |
+| user-event            | Simulacao de interacoes reais nos testes        | Sim       | Sim    | Selecao e nova tentativa apos erro            |
+| jest-dom              | Matchers semanticos para elementos do DOM       | Sim       | Sim    | Assercoes dos testes de componentes           |
+| jsdom                 | Ambiente de navegador para testes no Vitest     | Sim       | Sim    | Execucao dos testes React                     |
+| React Router          | Navegacao e protecao de rotas                   | Nao       | Nao    | Quando a aplicacao possuir mais de uma pagina |
+| React Hook Form       | Estado e submissao de formularios               | Nao       | Nao    | Nos formularios do MVP                        |
+| Zod                   | Validacao de dados e schemas no frontend        | Nao       | Nao    | Nos formularios que exigirem validacao        |
+| Playwright            | Testes ponta a ponta no navegador               | Nao       | Nao    | Quando existir um fluxo completo e estavel    |
 
 As colunas `Instalada` e `Em uso` diferenciam uma dependencia presente no
 projeto de uma dependencia realmente adotada pelo codigo. A tabela deve ser
@@ -84,7 +88,25 @@ npm run test --workspace @code-arena/web
 npm run build --workspace @code-arena/web
 ```
 
-O servidor de desenvolvimento usa `http://localhost:5173` por padrao.
+O servidor de desenvolvimento usa `http://localhost:5173` por padrao. Durante o
+desenvolvimento, o Vite encaminha `/api` para `http://localhost:8080`; assim o
+navegador usa a mesma origem e a API nao precisa liberar CORS para a porta do
+Vite. Para apontar diretamente para outra origem, defina `VITE_API_URL` antes de
+iniciar o frontend:
+
+```bash
+VITE_API_URL=http://localhost:8080 npm run dev:web
+```
+
+O fluxo implementado carrega as categorias pela cadeia:
+
+```text
+React -> Java Quiz SDK -> GET /api/v1/categories -> Spring Boot
+```
+
+A tela apresenta carregamento, erro com nova tentativa, lista vazia, sucesso e
+selecao multipla responsiva. A criacao da tentativa permanece planejada para o
+proximo incremento.
 
 ## Decisoes do frontend
 
@@ -96,9 +118,10 @@ cancelamento e erros.
 
 ### Estado local e remoto
 
-Estado local permanece proximo ao componente. TanStack Query sera usado para
-estado obtido da API. Estado global sera introduzido somente quando houver uma
-necessidade compartilhada, como autenticacao.
+Estado local permanece proximo ao componente. TanStack Query gerencia cache,
+cancelamento e estados das consultas obtidas da API. Estado global sera
+introduzido somente quando houver uma necessidade compartilhada, como
+autenticacao.
 
 ### ESLint em vez de Oxlint
 
