@@ -28,6 +28,16 @@ Na raiz do repositorio, use o caminho do Wrapper e indique o projeto Maven:
 Essa variante evita trocar de diretorio e mantem explicito qual aplicacao do
 monorepositorio esta sendo validada.
 
+Para verificar apenas a compilacao durante um ciclo curto de desenvolvimento:
+
+```bash
+./apps/api/mvnw --batch-mode --no-transfer-progress \
+  -f apps/api/pom.xml -DskipTests compile
+```
+
+Esse comando antecipa erros de codigo e configuracao sem substituir o `verify`
+completo exigido antes do commit.
+
 ## Executar a API local
 
 ```bash
