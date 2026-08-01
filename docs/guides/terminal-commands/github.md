@@ -104,7 +104,7 @@ bash .github/scripts/validate-pull-request-branch.sh <base> <origem>
 ## Montar o link de um Pull Request
 
 ```text
-https://github.com/<owner>/<repositorio>/compare/<base>...<branch-codificada>?expand=1
+https://github.com/<owner>/<repositorio>/compare/<base>...<branch-codificada>?expand=1&title=<titulo-codificado>&body=<descricao-codificada>
 ```
 
 Escolha `develop` para `feature/*`, `fix/*`, `docs/*` e `chore/*`; escolha
@@ -116,4 +116,6 @@ docs/011-web-readme-quality -> docs%2F011-web-readme-quality
 
 O link generico `/pull/new/<branch>` retornado pelo push pode selecionar `main`
 por ser a branch padrao. Ao abrir a comparacao, confirme visualmente os campos
-`base` e `compare` antes de criar o Pull Request.
+`base` e `compare` antes de criar o Pull Request. Use URL encoding no titulo e
+na descricao baseada em `.github/pull_request_template.md`; assim o formulario
+abre com ambos preenchidos e prontos para revisao.

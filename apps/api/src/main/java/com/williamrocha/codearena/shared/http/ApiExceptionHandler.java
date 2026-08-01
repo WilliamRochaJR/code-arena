@@ -12,8 +12,11 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -77,6 +80,25 @@ public class ApiExceptionHandler {
 			VALIDATION_ERROR_TYPE,
 			"Dados invalidos",
 			"O corpo da requisicao possui JSON ou valores invalidos.",
+			request);
+
+		return ResponseEntity.badRequest().body(problem);
+	}
+
+	@ExceptionHandler({
+		ConstraintViolationException.class,
+		HandlerMethodValidationException.class,
+		MethodArgumentTypeMismatchException.class
+	})
+	ResponseEntity<ProblemDetail> handleInvalidRequestParameter(
+		Exception exception,
+		HttpServletRequest request
+	) {
+		ProblemDetail problem = createProblem(
+			HttpStatus.BAD_REQUEST,
+			VALIDATION_ERROR_TYPE,
+			"Dados invalidos",
+			"Um ou mais parametros possuem valores invalidos.",
 			request);
 
 		return ResponseEntity.badRequest().body(problem);

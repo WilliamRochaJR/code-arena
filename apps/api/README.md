@@ -83,14 +83,14 @@ andamento.
 | Metodo | Caminho                                                  | Finalidade                                |
 | ------ | -------------------------------------------------------- | ----------------------------------------- |
 | `GET`  | `/api/v1/categories`                                     | Lista as categorias ativas do quiz        |
+| `GET`  | `/api/v1/quiz-attempts`                                  | Lista o historico paginado do usuario     |
 | `POST` | `/api/v1/quiz-attempts`                                  | Cria uma tentativa com dez questoes       |
 | `GET`  | `/api/v1/quiz-attempts/{attemptId}`                      | Consulta o progresso da propria tentativa |
 | `PUT`  | `/api/v1/quiz-attempts/{attemptId}/answers/{questionId}` | Cria ou substitui uma resposta            |
 | `POST` | `/api/v1/quiz-attempts/{attemptId}/completion`           | Conclui, corrige e calcula o resultado    |
 
-Os demais endpoints de tentativas documentados em
-[`docs/api/contracts.md`](../../docs/api/contracts.md) permanecem planejados
-para os proximos incrementos da Entrega 5.
+Os contratos completos, incluindo parametros de paginacao e exemplos, estao em
+[`docs/api/contracts.md`](../../docs/api/contracts.md).
 
 ## Persistencia do quiz
 
