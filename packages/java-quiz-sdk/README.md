@@ -65,3 +65,6 @@ npm run build --workspace @code-arena/java-quiz-sdk
 ```
 
 O build gera JavaScript ESM, source maps e declaracoes TypeScript em `dist/`.
+Esse diretorio e ignorado pelo Git. Os comandos raiz que verificam consumidores
+do SDK executam `npm run build:sdk` primeiro, garantindo que as exportacoes
+existam tambem depois de `npm ci` em um checkout limpo.

@@ -75,9 +75,18 @@ gh run list \
   --repo <owner>/<repositorio> \
   --branch <branch> \
   --limit <quantidade>
+
+gh pr checks <numero-do-pr> \
+  --json name,state,bucket,link,workflow
+
+gh run view <id-da-execucao> \
+  --job <id-do-job> \
+  --log
 ```
 
-Lista as execucoes recentes da branch.
+O primeiro lista as execucoes recentes da branch. `gh pr checks` identifica o
+job que falhou e seu link; `gh run view` recupera o log do job especifico sem
+misturar a saida dos checks que passaram.
 
 ## Consultar a API do GitHub
 

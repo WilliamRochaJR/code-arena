@@ -64,6 +64,17 @@ ss -ltnp 'sport = :<porta>'
 Ajuda a diagnosticar conflitos. O processo pode ficar oculto sem permissao
 suficiente.
 
+## Criar um diretorio temporario seguro
+
+```bash
+diretorio_da_tarefa="$(mktemp -d)"
+```
+
+`mktemp -d` cria um caminho exclusivo sob o diretorio temporario do sistema.
+Use uma variavel especifica da tarefa e mova para esse caminho somente
+artefatos que possam ser regenerados. Nunca reutilize variaveis de ambiente do
+sistema como `HOME` para armazenar esse destino.
+
 ## Verificar variaveis sem revelar valores
 
 ```bash
