@@ -1,0 +1,6 @@
+code-arena:
+  identity:
+    controlled:
+      display-name: Test Developer
+      email: developer@test.invalid
+      subject: test-user

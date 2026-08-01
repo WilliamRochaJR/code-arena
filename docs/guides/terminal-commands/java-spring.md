@@ -18,6 +18,16 @@ O Wrapper usa a versao Maven definida pelo projeto.
 
 `verify` inclui compilacao, testes, verificacao e empacotamento.
 
+Na raiz do repositorio, use o caminho do Wrapper e indique o projeto Maven:
+
+```bash
+./apps/api/mvnw --batch-mode --no-transfer-progress \
+  -f apps/api/pom.xml verify
+```
+
+Essa variante evita trocar de diretorio e mantem explicito qual aplicacao do
+monorepositorio esta sendo validada.
+
 ## Executar a API local
 
 ```bash

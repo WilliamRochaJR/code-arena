@@ -62,6 +62,11 @@ Consulte antes de alterar comportamento ou arquitetura:
   `main`.
 - Ao apresentar o link, informe tambem os valores esperados de `base` e
   `compare` para que o mantenedor os confirme antes de criar o Pull Request.
+- Sempre que fornecer um link para criar Pull Request, apresente junto, sem que
+  o mantenedor precise pedir, um titulo sugerido e uma descricao completa pronta
+  para copiar. A descricao deve seguir `.github/pull_request_template.md`, ser
+  baseada no diff e nas validacoes realmente executadas e nao marcar como
+  concluido aquilo que ainda estiver pendente.
 - Nunca faca push direto em `main` ou `develop`.
 - Nunca use force push em uma branch compartilhada.
 - Use Conventional Commits com uma intencao por commit.
@@ -137,6 +142,9 @@ do Pull Request.
 - Mantenha em `docs/guides/terminal-commands/` um catalogo de estudo organizado
   por assunto. Antes de registrar um comando reutilizavel, confirme que ele
   ainda nao existe no catalogo.
+- Nao trate automaticamente uma variante como repeticao quando ela permitir um
+  contexto de uso diferente, como executar pela raiz em vez de entrar em um
+  subdiretorio. Documente a variante quando essa diferenca for util para estudo.
 - Nao registre datas, repeticoes, a cronologia de tarefas nem comandos
   ocasionais de leitura e diagnostico. Explique objetivo, efeito e cuidados do
   comando uma unica vez no arquivo tematico adequado.

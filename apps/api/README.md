@@ -61,11 +61,33 @@ O bootstrap expoe:
 - `GET /actuator/prometheus`.
 
 Health e metricas sao publicos nesta fundacao para permitir verificacoes locais.
-Qualquer outro endpoint e negado explicitamente ate a integracao de autenticacao
-ser implementada.
+Nos perfis `local` e `test`, `/api/v1/**` usa uma identidade controlada e fica
+acessivel sem token para permitir a implementacao incremental do fluxo. No
+perfil padrao, esses endpoints continuam negados ate a integracao com Cognito.
 
 Logs usam SLF4J com Logback e sao escritos no console. Tokens, credenciais e
 outros dados sensiveis nao devem ser registrados.
+
+## Fundacao HTTP
+
+Erros da API usam `application/problem+json`. A camada compartilhada converte
+falhas de validacao e regras de negocio nos status `400`, `404`, `409` e `422`.
+Erros inesperados retornam uma mensagem generica e nao expoem detalhes internos.
+
+Os controllers e DTOs REST permanecem separados das entidades JPA. Respostas
+corretas e explicacoes nunca devem ser incluidas nos contratos de tentativas em
+andamento.
+
+## Endpoints implementados
+
+| Metodo | Caminho                 | Finalidade                          |
+| ------ | ----------------------- | ----------------------------------- |
+| `GET`  | `/api/v1/categories`    | Lista as categorias ativas do quiz  |
+| `POST` | `/api/v1/quiz-attempts` | Cria uma tentativa com dez questoes |
+
+Os demais endpoints de tentativas documentados em
+[`docs/api/contracts.md`](../../docs/api/contracts.md) permanecem planejados
+para os proximos incrementos da Entrega 5.
 
 ## Persistencia do quiz
 
