@@ -7,6 +7,23 @@ export interface CategoryList {
   items: Category[]
 }
 
+export type QuizDifficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED'
+
+export interface CreateQuizAttemptRequest {
+  difficulty: QuizDifficulty
+  categories: string[]
+}
+
+export interface QuizAttemptSummary {
+  id: string
+  status: 'IN_PROGRESS'
+  difficulty: QuizDifficulty
+  categories: string[]
+  totalQuestions: number
+  answeredQuestions: number
+  startedAt: string
+}
+
 export interface ProblemDetail {
   type?: string
   title?: string
@@ -29,8 +46,18 @@ export interface ListCategoriesOptions {
   signal?: AbortSignal
 }
 
+export interface CreateQuizAttemptOptions {
+  signal?: AbortSignal
+}
+
 export interface JavaQuizClient {
   categories: {
     list(options?: ListCategoriesOptions): Promise<CategoryList>
+  }
+  attempts: {
+    create(
+      request: CreateQuizAttemptRequest,
+      options?: CreateQuizAttemptOptions,
+    ): Promise<QuizAttemptSummary>
   }
 }

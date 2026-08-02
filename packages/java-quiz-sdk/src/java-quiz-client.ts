@@ -8,13 +8,22 @@ import {
 } from './errors.js'
 import type {
   CategoryList,
+  CreateQuizAttemptRequest,
   JavaQuizClient,
   JavaQuizClientOptions,
   ListCategoriesOptions,
   ProblemDetail,
+  QuizAttemptSummary,
+  QuizDifficulty,
 } from './types.js'
 
 const DEFAULT_TIMEOUT_MS = 10_000
+
+interface RequestOptions {
+  method?: 'GET' | 'POST'
+  body?: unknown
+  signal?: AbortSignal
+}
 
 export function createJavaQuizClient(
   options: JavaQuizClientOptions,
@@ -30,13 +39,18 @@ export function createJavaQuizClient(
     throw new TypeError('A fetch implementation is required.')
   }
 
-  async function request(path: string, signal?: AbortSignal): Promise<unknown> {
+  async function request(
+    path: string,
+    requestOptions: RequestOptions = {},
+  ): Promise<unknown> {
     const controller = new AbortController()
     let timedOut = false
-    const cancelRequest = () => controller.abort(signal?.reason)
-    signal?.addEventListener('abort', cancelRequest, { once: true })
-    if (signal?.aborted) {
-      controller.abort(signal.reason)
+    const cancelRequest = () => controller.abort(requestOptions.signal?.reason)
+    requestOptions.signal?.addEventListener('abort', cancelRequest, {
+      once: true,
+    })
+    if (requestOptions.signal?.aborted) {
+      controller.abort(requestOptions.signal.reason)
     }
     const timeout = setTimeout(() => {
       timedOut = true
@@ -55,9 +69,16 @@ export function createJavaQuizClient(
       if (token) {
         headers.set('Authorization', `Bearer ${token}`)
       }
+      if (requestOptions.body !== undefined) {
+        headers.set('Content-Type', 'application/json')
+      }
       const response = await fetchImplementation(`${baseUrl}${path}`, {
         headers,
+        method: requestOptions.method ?? 'GET',
         signal: controller.signal,
+        ...(requestOptions.body === undefined
+          ? {}
+          : { body: JSON.stringify(requestOptions.body) }),
       })
       if (!response.ok) {
         throw new JavaQuizHttpError(
@@ -73,21 +94,43 @@ export function createJavaQuizClient(
       if (timedOut) {
         throw new JavaQuizTimeoutError(timeoutMs)
       }
-      if (signal?.aborted || controller.signal.aborted) {
+      if (requestOptions.signal?.aborted || controller.signal.aborted) {
         throw new JavaQuizRequestCancelledError()
       }
       throw new JavaQuizNetworkError({ cause: error })
     } finally {
       clearTimeout(timeout)
-      signal?.removeEventListener('abort', cancelRequest)
+      requestOptions.signal?.removeEventListener('abort', cancelRequest)
     }
   }
 
   return {
     categories: {
       async list(listOptions?: ListCategoriesOptions): Promise<CategoryList> {
-        const body = await request('/api/v1/categories', listOptions?.signal)
+        const body = await request('/api/v1/categories', {
+          ...(listOptions?.signal === undefined
+            ? {}
+            : { signal: listOptions.signal }),
+        })
         if (!isCategoryList(body)) {
+          throw new JavaQuizInvalidResponseError()
+        }
+        return body
+      },
+    },
+    attempts: {
+      async create(
+        createRequest: CreateQuizAttemptRequest,
+        createOptions,
+      ): Promise<QuizAttemptSummary> {
+        const body = await request('/api/v1/quiz-attempts', {
+          method: 'POST',
+          body: createRequest,
+          ...(createOptions?.signal === undefined
+            ? {}
+            : { signal: createOptions.signal }),
+        })
+        if (!isQuizAttemptSummary(body)) {
           throw new JavaQuizInvalidResponseError()
         }
         return body
@@ -125,6 +168,26 @@ function isCategoryList(value: unknown): value is CategoryList {
         typeof item.slug === 'string' &&
         typeof item.name === 'string',
     )
+  )
+}
+
+function isQuizAttemptSummary(value: unknown): value is QuizAttemptSummary {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    value.status === 'IN_PROGRESS' &&
+    isQuizDifficulty(value.difficulty) &&
+    Array.isArray(value.categories) &&
+    value.categories.every((category) => typeof category === 'string') &&
+    typeof value.totalQuestions === 'number' &&
+    typeof value.answeredQuestions === 'number' &&
+    typeof value.startedAt === 'string'
+  )
+}
+
+function isQuizDifficulty(value: unknown): value is QuizDifficulty {
+  return (
+    value === 'BEGINNER' || value === 'INTERMEDIATE' || value === 'ADVANCED'
   )
 }
 
