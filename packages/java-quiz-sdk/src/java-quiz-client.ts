@@ -246,7 +246,7 @@ function isQuizAttemptDetails(value: unknown): value is QuizAttemptDetails {
   return (
     isRecord(value) &&
     typeof value.id === 'string' &&
-    value.status === 'IN_PROGRESS' &&
+    (value.status === 'IN_PROGRESS' || value.status === 'COMPLETED') &&
     isQuizDifficulty(value.difficulty) &&
     typeof value.totalQuestions === 'number' &&
     typeof value.answeredQuestions === 'number' &&

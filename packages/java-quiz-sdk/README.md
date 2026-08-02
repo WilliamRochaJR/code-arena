@@ -59,6 +59,10 @@ Os detalhes de uma tentativa em andamento nao incluem gabarito, indicador de
 acerto ou explicacao. Essas informacoes permanecem protegidas pela API ate a
 conclusao.
 
+O mesmo recurso pode carregar enunciados e alternativas de uma tentativa
+concluida para compor a revisao, mas continua sem devolver o gabarito. A
+correcao vem exclusivamente de `attempts.complete()`.
+
 Para concluir uma tentativa respondida e obter o resultado corrigido:
 
 ```ts

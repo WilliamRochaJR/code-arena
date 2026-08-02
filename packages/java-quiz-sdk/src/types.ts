@@ -40,7 +40,7 @@ export interface QuizQuestion {
 
 export interface QuizAttemptDetails {
   id: string
-  status: 'IN_PROGRESS'
+  status: 'IN_PROGRESS' | 'COMPLETED'
   difficulty: QuizDifficulty
   totalQuestions: number
   answeredQuestions: number
