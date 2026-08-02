@@ -10,6 +10,9 @@ export {
 export type {
   Category,
   CategoryList,
+  CompletedQuizAttempt,
+  CompletedQuizQuestion,
+  CompleteQuizAttemptOptions,
   CreateQuizAttemptOptions,
   CreateQuizAttemptRequest,
   GetQuizAttemptOptions,
@@ -18,6 +21,7 @@ export type {
   ListCategoriesOptions,
   ProblemDetail,
   QuizAlternative,
+  QuizCategoryPerformance,
   QuizAttemptDetails,
   QuizAttemptSummary,
   QuizDifficulty,

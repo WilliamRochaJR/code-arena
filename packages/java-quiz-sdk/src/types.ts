@@ -58,6 +58,33 @@ export interface SavedQuizAnswer {
   answeredAt: string
 }
 
+export interface QuizCategoryPerformance {
+  category: string
+  correct: number
+  total: number
+}
+
+export interface CompletedQuizQuestion {
+  id: string
+  position: number
+  selectedAlternativeId: string
+  correctAlternativeId: string
+  correct: boolean
+  explanation: string
+}
+
+export interface CompletedQuizAttempt {
+  attemptId: string
+  status: 'COMPLETED'
+  totalQuestions: number
+  correctAnswers: number
+  score: number
+  startedAt: string
+  completedAt: string
+  performanceByCategory: QuizCategoryPerformance[]
+  questions: CompletedQuizQuestion[]
+}
+
 export interface ProblemDetail {
   type?: string
   title?: string
@@ -92,6 +119,10 @@ export interface SaveQuizAnswerOptions {
   signal?: AbortSignal
 }
 
+export interface CompleteQuizAttemptOptions {
+  signal?: AbortSignal
+}
+
 export interface JavaQuizClient {
   categories: {
     list(options?: ListCategoriesOptions): Promise<CategoryList>
@@ -111,5 +142,9 @@ export interface JavaQuizClient {
       request: SaveQuizAnswerRequest,
       options?: SaveQuizAnswerOptions,
     ): Promise<SavedQuizAnswer>
+    complete(
+      attemptId: string,
+      options?: CompleteQuizAttemptOptions,
+    ): Promise<CompletedQuizAttempt>
   }
 }

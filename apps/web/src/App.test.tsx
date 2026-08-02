@@ -95,6 +95,9 @@ function createClient(
       create: createAttempt,
       get: getAttempt,
       saveAnswer,
+      complete: vi
+        .fn<JavaQuizClient['attempts']['complete']>()
+        .mockRejectedValue(new Error('Unexpected attempt completion request.')),
     },
   }
 }
