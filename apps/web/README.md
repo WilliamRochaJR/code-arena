@@ -48,18 +48,18 @@ As versoes exatas resolvidas ficam em [`package-lock.json`](../../package-lock.j
 
 ## Bibliotecas instaladas e planejadas
 
-| Biblioteca            | Finalidade                                      | Instalada | Em uso | Estado ou momento de adocao                   |
-| --------------------- | ----------------------------------------------- | --------- | ------ | --------------------------------------------- |
-| Java Quiz SDK         | Cliente REST e contratos TypeScript             | Sim       | Sim    | Listagem de categorias                        |
-| TanStack Query        | Cache, sincronizacao e estado remoto            | Sim       | Sim    | Consulta de categorias                        |
-| React Testing Library | Testes pela perspectiva de quem usa a interface | Sim       | Sim    | Estados e selecao de categorias               |
-| user-event            | Simulacao de interacoes reais nos testes        | Sim       | Sim    | Selecao e nova tentativa apos erro            |
-| jest-dom              | Matchers semanticos para elementos do DOM       | Sim       | Sim    | Assercoes dos testes de componentes           |
-| jsdom                 | Ambiente de navegador para testes no Vitest     | Sim       | Sim    | Execucao dos testes React                     |
-| React Router          | Navegacao e protecao de rotas                   | Nao       | Nao    | Quando a aplicacao possuir mais de uma pagina |
-| React Hook Form       | Estado e submissao de formularios               | Nao       | Nao    | Nos formularios do MVP                        |
-| Zod                   | Validacao de dados e schemas no frontend        | Nao       | Nao    | Nos formularios que exigirem validacao        |
-| Playwright            | Testes ponta a ponta no navegador               | Nao       | Nao    | Quando existir um fluxo completo e estavel    |
+| Biblioteca            | Finalidade                                      | Instalada | Em uso | Estado ou momento de adocao                |
+| --------------------- | ----------------------------------------------- | --------- | ------ | ------------------------------------------ |
+| Java Quiz SDK         | Cliente REST e contratos TypeScript             | Sim       | Sim    | Categorias e criacao de tentativa          |
+| TanStack Query        | Cache, sincronizacao e estado remoto            | Sim       | Sim    | Categorias e mutation da tentativa         |
+| React Testing Library | Testes pela perspectiva de quem usa a interface | Sim       | Sim    | Configuracao e criacao de tentativa        |
+| user-event            | Simulacao de interacoes reais nos testes        | Sim       | Sim    | Selecao e nova tentativa apos erro         |
+| jest-dom              | Matchers semanticos para elementos do DOM       | Sim       | Sim    | Assercoes dos testes de componentes        |
+| jsdom                 | Ambiente de navegador para testes no Vitest     | Sim       | Sim    | Execucao dos testes React                  |
+| React Router          | Navegacao declarativa entre etapas              | Sim       | Sim    | Categorias, dificuldade e tentativa criada |
+| React Hook Form       | Estado e submissao de formularios               | Nao       | Nao    | Nos formularios do MVP                     |
+| Zod                   | Validacao de dados e schemas no frontend        | Nao       | Nao    | Nos formularios que exigirem validacao     |
+| Playwright            | Testes ponta a ponta no navegador               | Nao       | Nao    | Quando existir um fluxo completo e estavel |
 
 As colunas `Instalada` e `Em uso` diferenciam uma dependencia presente no
 projeto de uma dependencia realmente adotada pelo codigo. A tabela deve ser
@@ -98,15 +98,17 @@ iniciar o frontend:
 VITE_API_URL=http://localhost:8080 npm run dev:web
 ```
 
-O fluxo implementado carrega as categorias pela cadeia:
+O fluxo implementado configura e cria uma tentativa pela cadeia:
 
 ```text
-React -> Java Quiz SDK -> GET /api/v1/categories -> Spring Boot
+Categorias -> Dificuldade -> Java Quiz SDK -> POST /api/v1/quiz-attempts
 ```
 
-A tela apresenta carregamento, erro com nova tentativa, lista vazia, sucesso e
-selecao multipla responsiva. A criacao da tentativa permanece planejada para o
-proximo incremento.
+A aplicacao possui rotas para categorias, dificuldade e tentativa criada. As
+escolhas de configuracao ficam nos parametros da URL, preservando o estado ao
+avancar, voltar ou usar a navegacao do browser. A criacao bloqueia envios
+duplicados, apresenta erros e permite nova tentativa. A renderizacao das
+perguntas permanece planejada para o proximo incremento.
 
 ## Decisoes do frontend
 
@@ -122,6 +124,27 @@ Estado local permanece proximo ao componente. TanStack Query gerencia cache,
 cancelamento e estados das consultas obtidas da API. Estado global sera
 introduzido somente quando houver uma necessidade compartilhada, como
 autenticacao.
+
+### URL como estado da configuracao
+
+Categorias e dificuldade usam query parameters enquanto a pessoa configura o
+quiz. Isso torna as etapas navegaveis, preserva as escolhas no historico do
+browser e evita um store global para um estado curto. Depois da criacao, o ID da
+tentativa passa a fazer parte do caminho `/quiz-attempts/{id}`.
+
+### Risco residual do React Router
+
+O projeto fixa `react-router-dom` em `7.18.2`. O `npm audit` sinaliza o advisory
+`GHSA-qwww-vcr4-c8h2`, relacionado a execucao de Actions no modo React Server
+Components (RSC). O Code Arena usa uma SPA client-side com Vite e nao habilita
+RSC, SSR nem React Router Actions, portanto o caminho vulneravel nao faz parte da
+arquitetura atual.
+
+Versoes anteriores possuem outros advisories de XSS e open redirect, por isso o
+projeto nao fez downgrade para ocultar o alerta. RSC nao deve ser habilitado sem
+nova avaliacao, e a dependencia deve ser atualizada quando uma versao corrigida
+e compativel estiver disponivel. Consulte o
+[ADR 0006](../../docs/decisions/0006-use-react-router-with-rsc-disabled.md).
 
 ### ESLint em vez de Oxlint
 
