@@ -31,7 +31,15 @@ function createClient(
     categories: {
       list: vi.fn(() => categoriesResult),
     },
-    attempts: { create: createAttempt },
+    attempts: {
+      create: createAttempt,
+      get: vi
+        .fn<JavaQuizClient['attempts']['get']>()
+        .mockRejectedValue(new Error('Unexpected attempt details request.')),
+      saveAnswer: vi
+        .fn<JavaQuizClient['attempts']['saveAnswer']>()
+        .mockRejectedValue(new Error('Unexpected save answer request.')),
+    },
   }
 }
 

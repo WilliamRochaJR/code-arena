@@ -9,18 +9,21 @@ import {
 import type {
   CategoryList,
   CreateQuizAttemptRequest,
+  QuizAttemptDetails,
   JavaQuizClient,
   JavaQuizClientOptions,
   ListCategoriesOptions,
   ProblemDetail,
   QuizAttemptSummary,
   QuizDifficulty,
+  SavedQuizAnswer,
+  SaveQuizAnswerRequest,
 } from './types.js'
 
 const DEFAULT_TIMEOUT_MS = 10_000
 
 interface RequestOptions {
-  method?: 'GET' | 'POST'
+  method?: 'GET' | 'POST' | 'PUT'
   body?: unknown
   signal?: AbortSignal
 }
@@ -135,6 +138,41 @@ export function createJavaQuizClient(
         }
         return body
       },
+      async get(attemptId, getOptions): Promise<QuizAttemptDetails> {
+        const body = await request(
+          `/api/v1/quiz-attempts/${encodeURIComponent(attemptId)}`,
+          {
+            ...(getOptions?.signal === undefined
+              ? {}
+              : { signal: getOptions.signal }),
+          },
+        )
+        if (!isQuizAttemptDetails(body)) {
+          throw new JavaQuizInvalidResponseError()
+        }
+        return body
+      },
+      async saveAnswer(
+        attemptId: string,
+        questionId: string,
+        saveRequest: SaveQuizAnswerRequest,
+        saveOptions,
+      ): Promise<SavedQuizAnswer> {
+        const body = await request(
+          `/api/v1/quiz-attempts/${encodeURIComponent(attemptId)}/answers/${encodeURIComponent(questionId)}`,
+          {
+            method: 'PUT',
+            body: saveRequest,
+            ...(saveOptions?.signal === undefined
+              ? {}
+              : { signal: saveOptions.signal }),
+          },
+        )
+        if (!isSavedQuizAnswer(body)) {
+          throw new JavaQuizInvalidResponseError()
+        }
+        return body
+      },
     },
   }
 }
@@ -182,6 +220,49 @@ function isQuizAttemptSummary(value: unknown): value is QuizAttemptSummary {
     typeof value.totalQuestions === 'number' &&
     typeof value.answeredQuestions === 'number' &&
     typeof value.startedAt === 'string'
+  )
+}
+
+function isQuizAttemptDetails(value: unknown): value is QuizAttemptDetails {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    value.status === 'IN_PROGRESS' &&
+    isQuizDifficulty(value.difficulty) &&
+    typeof value.totalQuestions === 'number' &&
+    typeof value.answeredQuestions === 'number' &&
+    typeof value.startedAt === 'string' &&
+    Array.isArray(value.questions) &&
+    value.questions.every(isQuizQuestion)
+  )
+}
+
+function isQuizQuestion(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.position === 'number' &&
+    typeof value.statement === 'string' &&
+    Array.isArray(value.categories) &&
+    value.categories.every((category) => typeof category === 'string') &&
+    Array.isArray(value.alternatives) &&
+    value.alternatives.every(
+      (alternative) =>
+        isRecord(alternative) &&
+        typeof alternative.id === 'string' &&
+        typeof alternative.text === 'string',
+    ) &&
+    (value.selectedAlternativeId === null ||
+      typeof value.selectedAlternativeId === 'string')
+  )
+}
+
+function isSavedQuizAnswer(value: unknown): value is SavedQuizAnswer {
+  return (
+    isRecord(value) &&
+    typeof value.questionId === 'string' &&
+    typeof value.selectedAlternativeId === 'string' &&
+    typeof value.answeredAt === 'string'
   )
 }
 
