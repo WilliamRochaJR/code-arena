@@ -115,6 +115,65 @@ describe('createJavaQuizClient', () => {
     ).rejects.toBeInstanceOf(JavaQuizInvalidResponseError)
   })
 
+  it('lists filtered quiz attempts with pagination', async () => {
+    const history = {
+      items: [
+        {
+          id: 'attempt-id',
+          status: 'COMPLETED' as const,
+          difficulty: 'INTERMEDIATE' as const,
+          categories: ['OOP'],
+          score: 80,
+          startedAt: '2026-07-22T18:30:00Z',
+          completedAt: '2026-07-22T18:40:00Z',
+        },
+      ],
+      page: 1,
+      size: 10,
+      totalItems: 12,
+      totalPages: 2,
+    }
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(Response.json(history))
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      fetch: fetchMock,
+    })
+    await expect(
+      client.attempts.list({ page: 1, size: 10, status: 'COMPLETED' }),
+    ).resolves.toEqual(history)
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:8080/api/v1/quiz-attempts?page=1&size=10&status=COMPLETED',
+      expect.anything(),
+    )
+  })
+
+  it('accepts nullable result fields in an in-progress history item', async () => {
+    const history = {
+      items: [
+        {
+          id: 'attempt-id',
+          status: 'IN_PROGRESS',
+          difficulty: 'BEGINNER',
+          categories: ['OOP'],
+          score: null,
+          startedAt: '2026-07-22T18:30:00Z',
+          completedAt: null,
+        },
+      ],
+      page: 0,
+      size: 10,
+      totalItems: 1,
+      totalPages: 1,
+    }
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      fetch: vi.fn<typeof fetch>().mockResolvedValue(Response.json(history)),
+    })
+    await expect(client.attempts.list()).resolves.toEqual(history)
+  })
+
   it('gets a quiz attempt without exposing answer correctness', async () => {
     const attempt = {
       id: 'df34978a-2024-4234-9ba8-1af6cf7af994',

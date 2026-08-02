@@ -8,6 +8,7 @@ export interface CategoryList {
 }
 
 export type QuizDifficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED'
+export type QuizAttemptStatus = 'IN_PROGRESS' | 'COMPLETED'
 
 export interface CreateQuizAttemptRequest {
   difficulty: QuizDifficulty
@@ -85,6 +86,24 @@ export interface CompletedQuizAttempt {
   questions: CompletedQuizQuestion[]
 }
 
+export interface QuizAttemptHistoryItem {
+  id: string
+  status: QuizAttemptStatus
+  difficulty: QuizDifficulty
+  categories: string[]
+  score: number | null
+  startedAt: string
+  completedAt: string | null
+}
+
+export interface QuizAttemptHistory {
+  items: QuizAttemptHistoryItem[]
+  page: number
+  size: number
+  totalItems: number
+  totalPages: number
+}
+
 export interface ProblemDetail {
   type?: string
   title?: string
@@ -123,11 +142,19 @@ export interface CompleteQuizAttemptOptions {
   signal?: AbortSignal
 }
 
+export interface ListQuizAttemptsOptions {
+  page?: number
+  size?: number
+  status?: QuizAttemptStatus
+  signal?: AbortSignal
+}
+
 export interface JavaQuizClient {
   categories: {
     list(options?: ListCategoriesOptions): Promise<CategoryList>
   }
   attempts: {
+    list(options?: ListQuizAttemptsOptions): Promise<QuizAttemptHistory>
     create(
       request: CreateQuizAttemptRequest,
       options?: CreateQuizAttemptOptions,

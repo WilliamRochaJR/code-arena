@@ -125,6 +125,13 @@ function createClient(
       list: vi.fn(() => categoriesResult),
     },
     attempts: {
+      list: vi.fn<JavaQuizClient['attempts']['list']>().mockResolvedValue({
+        items: [],
+        page: 0,
+        size: 10,
+        totalItems: 0,
+        totalPages: 0,
+      }),
       create: createAttempt,
       get: getAttempt,
       saveAnswer,
