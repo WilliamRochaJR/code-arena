@@ -5,6 +5,7 @@ import { javaQuizClient } from './api/java-quiz-client'
 import { CategorySelectionPage } from './quiz/CategorySelectionPage'
 import { DifficultySelectionPage } from './quiz/DifficultySelectionPage'
 import { QuizAttemptPage } from './quiz/QuizAttemptPage'
+import { QuizResultPage } from './quiz/QuizResultPage'
 import './App.css'
 
 interface AppProps {
@@ -27,6 +28,10 @@ function App({ client = javaQuizClient }: AppProps) {
         <Route
           path="/quiz-attempts/:attemptId/questions/:position"
           element={<QuizAttemptPage client={client} />}
+        />
+        <Route
+          path="/quiz-attempts/:attemptId/result"
+          element={<QuizResultPage client={client} />}
         />
         <Route path="*" element={<Navigate replace to="/quiz/categories" />} />
       </Route>

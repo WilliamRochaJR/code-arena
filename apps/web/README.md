@@ -50,8 +50,8 @@ As versoes exatas resolvidas ficam em [`package-lock.json`](../../package-lock.j
 
 | Biblioteca            | Finalidade                                      | Instalada | Em uso | Estado ou momento de adocao                |
 | --------------------- | ----------------------------------------------- | --------- | ------ | ------------------------------------------ |
-| Java Quiz SDK         | Cliente REST e contratos TypeScript             | Sim       | Sim    | Categorias, tentativas e respostas         |
-| TanStack Query        | Cache, sincronizacao e estado remoto            | Sim       | Sim    | Categorias, tentativas e mutations         |
+| Java Quiz SDK         | Cliente REST e contratos TypeScript             | Sim       | Sim    | Quiz completo e resultados                 |
+| TanStack Query        | Cache, sincronizacao e estado remoto            | Sim       | Sim    | Quiz, conclusao e resultado                |
 | React Testing Library | Testes pela perspectiva de quem usa a interface | Sim       | Sim    | Configuracao e execucao da tentativa       |
 | user-event            | Simulacao de interacoes reais nos testes        | Sim       | Sim    | Selecao, retry, salvamento e navegacao     |
 | jest-dom              | Matchers semanticos para elementos do DOM       | Sim       | Sim    | Assercoes dos testes de componentes        |
@@ -103,6 +103,7 @@ O fluxo implementado configura, cria e executa uma tentativa pela cadeia:
 ```text
 Categorias -> Dificuldade -> POST da tentativa -> GET das perguntas
            -> selecao da alternativa -> PUT da resposta -> proxima pergunta
+           -> POST da conclusao -> resultado e revisao
 ```
 
 A aplicacao possui rotas para categorias, dificuldade e cada posicao da
@@ -111,7 +112,8 @@ o estado ao avancar, voltar ou usar a navegacao do browser. Depois da criacao, a
 tentativa e carregada pela API, permitindo abrir ou atualizar diretamente a URL
 de uma pergunta. O frontend restaura respostas salvas, bloqueia envios
 duplicados, apresenta erros com retry e salva a alternativa antes de avancar. A
-conclusao da tentativa permanece planejada para o proximo incremento.
+conclusao exige confirmacao e leva a um resultado recarregavel com pontuacao,
+desempenho por categoria, respostas corretas e explicacoes.
 
 ## Decisoes do frontend
 
@@ -134,7 +136,8 @@ Categorias e dificuldade usam query parameters enquanto a pessoa configura o
 quiz. Isso torna as etapas navegaveis, preserva as escolhas no historico do
 browser e evita um store global para um estado curto. Depois da criacao, o ID da
 tentativa e a posicao passam a fazer parte do caminho
-`/quiz-attempts/{id}/questions/{position}`.
+`/quiz-attempts/{id}/questions/{position}`. O resultado usa
+`/quiz-attempts/{id}/result`.
 
 ### Risco residual do React Router
 

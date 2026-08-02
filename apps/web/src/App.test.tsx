@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import type {
   CategoryList,
+  CompletedQuizAttempt,
   JavaQuizClient,
   QuizAttemptDetails,
   QuizAttemptSummary,
@@ -71,6 +72,35 @@ const ATTEMPT_DETAILS: QuizAttemptDetails = {
   questions: [FIRST_QUESTION, SECOND_QUESTION],
 }
 
+const COMPLETED_ATTEMPT: CompletedQuizAttempt = {
+  attemptId: ATTEMPT.id,
+  status: 'COMPLETED',
+  totalQuestions: 2,
+  correctAnswers: 1,
+  score: 50,
+  startedAt: ATTEMPT.startedAt,
+  completedAt: '2026-07-22T18:40:00Z',
+  performanceByCategory: [{ category: 'COLLECTIONS', correct: 1, total: 2 }],
+  questions: [
+    {
+      id: FIRST_QUESTION.id,
+      position: 1,
+      selectedAlternativeId: FIRST_ALTERNATIVE_ID,
+      correctAlternativeId: FIRST_ALTERNATIVE_ID,
+      correct: true,
+      explanation: 'List mantém a ordem.',
+    },
+    {
+      id: SECOND_QUESTION.id,
+      position: 2,
+      selectedAlternativeId: SECOND_QUESTION.alternatives[0]!.id,
+      correctAlternativeId: SECOND_QUESTION.alternatives[1]!.id,
+      correct: false,
+      explanation: 'Set não aceita duplicados.',
+    },
+  ],
+}
+
 function createClient(
   categoriesResult: Promise<CategoryList> = Promise.resolve({ items: [] }),
   createAttempt: JavaQuizClient['attempts']['create'] = vi
@@ -86,6 +116,9 @@ function createClient(
       selectedAlternativeId: request.selectedAlternativeId,
       answeredAt: '2026-07-22T18:32:00Z',
     })),
+  completeAttempt: JavaQuizClient['attempts']['complete'] = vi
+    .fn<JavaQuizClient['attempts']['complete']>()
+    .mockResolvedValue(COMPLETED_ATTEMPT),
 ): JavaQuizClient {
   return {
     categories: {
@@ -95,9 +128,7 @@ function createClient(
       create: createAttempt,
       get: getAttempt,
       saveAnswer,
-      complete: vi
-        .fn<JavaQuizClient['attempts']['complete']>()
-        .mockRejectedValue(new Error('Unexpected attempt completion request.')),
+      complete: completeAttempt,
     },
   }
 }
@@ -358,8 +389,43 @@ describe('App', () => {
     expect(
       await screen.findByText('Respostas prontas para conclusão.'),
     ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Concluir quiz' }))
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+    await user.click(
+      screen.getByRole('button', { name: 'Confirmar conclusão' }),
+    )
     expect(
-      screen.getByRole('button', { name: 'Conclusão em breve' }),
-    ).toBeDisabled()
+      await screen.findByRole('heading', { name: '50%' }),
+    ).toBeInTheDocument()
+  })
+
+  it('reloads a completed quiz result with its review', async () => {
+    const completedDetails: QuizAttemptDetails = {
+      ...ATTEMPT_DETAILS,
+      status: 'COMPLETED',
+      answeredQuestions: 2,
+      questions: ATTEMPT_DETAILS.questions.map((question) => ({
+        ...question,
+        selectedAlternativeId:
+          question.id === FIRST_QUESTION.id
+            ? FIRST_ALTERNATIVE_ID
+            : SECOND_QUESTION.alternatives[0]!.id,
+      })),
+    }
+    renderApp(
+      createClient(
+        undefined,
+        undefined,
+        vi
+          .fn<JavaQuizClient['attempts']['get']>()
+          .mockResolvedValue(completedDetails),
+      ),
+      `/quiz-attempts/${ATTEMPT.id}/result`,
+    )
+    expect(
+      await screen.findByRole('heading', { name: '50%' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Set não aceita duplicados.')).toBeInTheDocument()
+    expect(screen.getByText(/Resposta correta:/)).toBeInTheDocument()
   })
 })
