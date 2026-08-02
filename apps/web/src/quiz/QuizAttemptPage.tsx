@@ -29,6 +29,7 @@ export function QuizAttemptPage({ client }: QuizAttemptPageProps) {
   const [localSelections, setLocalSelections] = useState<
     Record<string, string>
   >({})
+  const [confirmingCompletion, setConfirmingCompletion] = useState(false)
   const selectedAlternativeId = question
     ? (localSelections[question.id] ?? question.selectedAlternativeId)
     : null
@@ -72,6 +73,10 @@ export function QuizAttemptPage({ client }: QuizAttemptPageProps) {
         )
       }
     },
+  })
+  const completeAttempt = useMutation({
+    mutationFn: () => client.attempts.complete(attemptId ?? ''),
+    onSuccess: () => navigate(`/quiz-attempts/${attemptId}/result`),
   })
 
   if (attemptQuery.isPending) {
@@ -216,9 +221,47 @@ export function QuizAttemptPage({ client }: QuizAttemptPageProps) {
           <div className="ready-notice" role="status">
             <strong>Respostas prontas para conclusão.</strong>
             <span>
-              Revise suas escolhas. A conclusão será adicionada no próximo
-              incremento.
+              Revise suas escolhas antes de concluir. Depois disso, as respostas
+              não poderão ser alteradas.
             </span>
+          </div>
+        )}
+
+        {confirmingCompletion && (
+          <div
+            className="completion-confirmation"
+            role="alertdialog"
+            aria-labelledby="completion-title"
+          >
+            <strong id="completion-title">Concluir esta tentativa?</strong>
+            <span>
+              A correção será exibida e suas respostas ficarão bloqueadas.
+            </span>
+            {completeAttempt.isError && (
+              <span className="completion-error">
+                Não foi possível concluir. Tente novamente.
+              </span>
+            )}
+            <div>
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={completeAttempt.isPending}
+                onClick={() => setConfirmingCompletion(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="primary-button"
+                type="button"
+                disabled={completeAttempt.isPending}
+                onClick={() => completeAttempt.mutate()}
+              >
+                {completeAttempt.isPending
+                  ? 'Concluindo...'
+                  : 'Confirmar conclusão'}
+              </button>
+            </div>
           </div>
         )}
 
@@ -240,14 +283,21 @@ export function QuizAttemptPage({ client }: QuizAttemptPageProps) {
             disabled={
               !selectedAlternativeId ||
               saveAnswer.isPending ||
-              (isLastQuestion && allQuestionsAnswered)
+              completeAttempt.isPending
             }
-            onClick={() => saveAnswer.mutate()}
+            onClick={() => {
+              if (isLastQuestion && allQuestionsAnswered) {
+                completeAttempt.reset()
+                setConfirmingCompletion(true)
+              } else {
+                saveAnswer.mutate()
+              }
+            }}
           >
             {saveAnswer.isPending
               ? 'Salvando...'
               : isLastQuestion && allQuestionsAnswered
-                ? 'Conclusão em breve'
+                ? 'Concluir quiz'
                 : isLastQuestion
                   ? 'Salvar resposta'
                   : 'Salvar e avançar'}

@@ -154,6 +154,42 @@ describe('createJavaQuizClient', () => {
     )
   })
 
+  it('gets the question text for a completed quiz attempt', async () => {
+    const completedDetails = {
+      id: 'df34978a-2024-4234-9ba8-1af6cf7af994',
+      status: 'COMPLETED' as const,
+      difficulty: 'INTERMEDIATE' as const,
+      totalQuestions: 1,
+      answeredQuestions: 1,
+      startedAt: '2026-07-22T18:30:00Z',
+      questions: [
+        {
+          id: '41b42e76-7657-4d31-ae42-f47a31dd18ca',
+          position: 1,
+          statement: 'Qual interface representa uma lista ordenada?',
+          categories: ['COLLECTIONS'],
+          alternatives: [
+            {
+              id: 'cc187215-c0f2-44a6-803f-392fbd21a2df',
+              text: 'List',
+            },
+          ],
+          selectedAlternativeId: 'cc187215-c0f2-44a6-803f-392fbd21a2df',
+        },
+      ],
+    }
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      fetch: vi
+        .fn<typeof fetch>()
+        .mockResolvedValue(Response.json(completedDetails)),
+    })
+
+    await expect(client.attempts.get(completedDetails.id)).resolves.toEqual(
+      completedDetails,
+    )
+  })
+
   it('saves a quiz answer with a PUT request', async () => {
     const savedAnswer = {
       questionId: '41b42e76-7657-4d31-ae42-f47a31dd18ca',
@@ -208,6 +244,62 @@ describe('createJavaQuizClient', () => {
         selectedAlternativeId: 'alternative-id',
       }),
     ).rejects.toBeInstanceOf(JavaQuizInvalidResponseError)
+  })
+
+  it('completes a quiz attempt with a POST request', async () => {
+    const completedAttempt = {
+      attemptId: 'df34978a-2024-4234-9ba8-1af6cf7af994',
+      status: 'COMPLETED' as const,
+      totalQuestions: 1,
+      correctAnswers: 1,
+      score: 100,
+      startedAt: '2026-07-22T18:30:00Z',
+      completedAt: '2026-07-22T18:40:00Z',
+      performanceByCategory: [
+        { category: 'COLLECTIONS', correct: 1, total: 1 },
+      ],
+      questions: [
+        {
+          id: '41b42e76-7657-4d31-ae42-f47a31dd18ca',
+          position: 1,
+          selectedAlternativeId: 'cc187215-c0f2-44a6-803f-392fbd21a2df',
+          correctAlternativeId: 'cc187215-c0f2-44a6-803f-392fbd21a2df',
+          correct: true,
+          explanation: 'List representa uma lista ordenada.',
+        },
+      ],
+    }
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(Response.json(completedAttempt))
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      fetch: fetchMock,
+    })
+
+    await expect(
+      client.attempts.complete(completedAttempt.attemptId),
+    ).resolves.toEqual(completedAttempt)
+    expect(fetchMock).toHaveBeenCalledWith(
+      `http://localhost:8080/api/v1/quiz-attempts/${completedAttempt.attemptId}/completion`,
+      expect.objectContaining({ method: 'POST' }),
+    )
+  })
+
+  it('rejects an invalid completed quiz response', async () => {
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      fetch: vi.fn<typeof fetch>().mockResolvedValue(
+        Response.json({
+          attemptId: 'attempt-with-missing-result',
+          status: 'COMPLETED',
+        }),
+      ),
+    })
+
+    await expect(client.attempts.complete('attempt-id')).rejects.toBeInstanceOf(
+      JavaQuizInvalidResponseError,
+    )
   })
 
   it('rejects invalid successful responses', async () => {

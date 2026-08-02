@@ -8,6 +8,7 @@ import {
 } from './errors.js'
 import type {
   CategoryList,
+  CompletedQuizAttempt,
   CreateQuizAttemptRequest,
   QuizAttemptDetails,
   JavaQuizClient,
@@ -173,6 +174,24 @@ export function createJavaQuizClient(
         }
         return body
       },
+      async complete(
+        attemptId,
+        completeOptions,
+      ): Promise<CompletedQuizAttempt> {
+        const body = await request(
+          `/api/v1/quiz-attempts/${encodeURIComponent(attemptId)}/completion`,
+          {
+            method: 'POST',
+            ...(completeOptions?.signal === undefined
+              ? {}
+              : { signal: completeOptions.signal }),
+          },
+        )
+        if (!isCompletedQuizAttempt(body)) {
+          throw new JavaQuizInvalidResponseError()
+        }
+        return body
+      },
     },
   }
 }
@@ -227,7 +246,7 @@ function isQuizAttemptDetails(value: unknown): value is QuizAttemptDetails {
   return (
     isRecord(value) &&
     typeof value.id === 'string' &&
-    value.status === 'IN_PROGRESS' &&
+    (value.status === 'IN_PROGRESS' || value.status === 'COMPLETED') &&
     isQuizDifficulty(value.difficulty) &&
     typeof value.totalQuestions === 'number' &&
     typeof value.answeredQuestions === 'number' &&
@@ -263,6 +282,44 @@ function isSavedQuizAnswer(value: unknown): value is SavedQuizAnswer {
     typeof value.questionId === 'string' &&
     typeof value.selectedAlternativeId === 'string' &&
     typeof value.answeredAt === 'string'
+  )
+}
+
+function isCompletedQuizAttempt(value: unknown): value is CompletedQuizAttempt {
+  return (
+    isRecord(value) &&
+    typeof value.attemptId === 'string' &&
+    value.status === 'COMPLETED' &&
+    typeof value.totalQuestions === 'number' &&
+    typeof value.correctAnswers === 'number' &&
+    typeof value.score === 'number' &&
+    typeof value.startedAt === 'string' &&
+    typeof value.completedAt === 'string' &&
+    Array.isArray(value.performanceByCategory) &&
+    value.performanceByCategory.every(isQuizCategoryPerformance) &&
+    Array.isArray(value.questions) &&
+    value.questions.every(isCompletedQuizQuestion)
+  )
+}
+
+function isQuizCategoryPerformance(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    typeof value.category === 'string' &&
+    typeof value.correct === 'number' &&
+    typeof value.total === 'number'
+  )
+}
+
+function isCompletedQuizQuestion(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.position === 'number' &&
+    typeof value.selectedAlternativeId === 'string' &&
+    typeof value.correctAlternativeId === 'string' &&
+    typeof value.correct === 'boolean' &&
+    typeof value.explanation === 'string'
   )
 }
 

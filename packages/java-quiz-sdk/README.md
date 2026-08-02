@@ -20,6 +20,7 @@ nem use `fetch` diretamente.
 | Tentativas | `attempts.create()`     | `POST /api/v1/quiz-attempts`                         | Em uso     |
 | Tentativas | `attempts.get()`        | `GET /api/v1/quiz-attempts/{attemptId}`              | Disponivel |
 | Respostas  | `attempts.saveAnswer()` | `PUT /api/v1/quiz-attempts/{attemptId}/answers/{id}` | Disponivel |
+| Resultado  | `attempts.complete()`   | `POST /api/v1/quiz-attempts/{attemptId}/completion`  | Disponivel |
 
 ## Uso
 
@@ -57,6 +58,19 @@ await client.attempts.saveAnswer(attempt.id, question.id, {
 Os detalhes de uma tentativa em andamento nao incluem gabarito, indicador de
 acerto ou explicacao. Essas informacoes permanecem protegidas pela API ate a
 conclusao.
+
+O mesmo recurso pode carregar enunciados e alternativas de uma tentativa
+concluida para compor a revisao, mas continua sem devolver o gabarito. A
+correcao vem exclusivamente de `attempts.complete()`.
+
+Para concluir uma tentativa respondida e obter o resultado corrigido:
+
+```ts
+const result = await client.attempts.complete(attempt.id)
+```
+
+A operacao de conclusao e idempotente: depois da primeira conclusao, chamadas
+repetidas devolvem o resultado persistido pela API sem recalcular a tentativa.
 
 O `tokenProvider` e opcional para permitir o perfil local com identidade
 controlada. Em ambientes autenticados, ele deve fornecer somente o access token.
