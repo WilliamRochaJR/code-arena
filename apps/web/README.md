@@ -50,13 +50,13 @@ As versoes exatas resolvidas ficam em [`package-lock.json`](../../package-lock.j
 
 | Biblioteca            | Finalidade                                      | Instalada | Em uso | Estado ou momento de adocao                |
 | --------------------- | ----------------------------------------------- | --------- | ------ | ------------------------------------------ |
-| Java Quiz SDK         | Cliente REST e contratos TypeScript             | Sim       | Sim    | Categorias e criacao de tentativa          |
-| TanStack Query        | Cache, sincronizacao e estado remoto            | Sim       | Sim    | Categorias e mutation da tentativa         |
-| React Testing Library | Testes pela perspectiva de quem usa a interface | Sim       | Sim    | Configuracao e criacao de tentativa        |
-| user-event            | Simulacao de interacoes reais nos testes        | Sim       | Sim    | Selecao e nova tentativa apos erro         |
+| Java Quiz SDK         | Cliente REST e contratos TypeScript             | Sim       | Sim    | Categorias, tentativas e respostas         |
+| TanStack Query        | Cache, sincronizacao e estado remoto            | Sim       | Sim    | Categorias, tentativas e mutations         |
+| React Testing Library | Testes pela perspectiva de quem usa a interface | Sim       | Sim    | Configuracao e execucao da tentativa       |
+| user-event            | Simulacao de interacoes reais nos testes        | Sim       | Sim    | Selecao, retry, salvamento e navegacao     |
 | jest-dom              | Matchers semanticos para elementos do DOM       | Sim       | Sim    | Assercoes dos testes de componentes        |
 | jsdom                 | Ambiente de navegador para testes no Vitest     | Sim       | Sim    | Execucao dos testes React                  |
-| React Router          | Navegacao declarativa entre etapas              | Sim       | Sim    | Categorias, dificuldade e tentativa criada |
+| React Router          | Navegacao declarativa entre etapas              | Sim       | Sim    | Configuracao e perguntas por posicao       |
 | React Hook Form       | Estado e submissao de formularios               | Nao       | Nao    | Nos formularios do MVP                     |
 | Zod                   | Validacao de dados e schemas no frontend        | Nao       | Nao    | Nos formularios que exigirem validacao     |
 | Playwright            | Testes ponta a ponta no navegador               | Nao       | Nao    | Quando existir um fluxo completo e estavel |
@@ -98,17 +98,20 @@ iniciar o frontend:
 VITE_API_URL=http://localhost:8080 npm run dev:web
 ```
 
-O fluxo implementado configura e cria uma tentativa pela cadeia:
+O fluxo implementado configura, cria e executa uma tentativa pela cadeia:
 
 ```text
-Categorias -> Dificuldade -> Java Quiz SDK -> POST /api/v1/quiz-attempts
+Categorias -> Dificuldade -> POST da tentativa -> GET das perguntas
+           -> selecao da alternativa -> PUT da resposta -> proxima pergunta
 ```
 
-A aplicacao possui rotas para categorias, dificuldade e tentativa criada. As
-escolhas de configuracao ficam nos parametros da URL, preservando o estado ao
-avancar, voltar ou usar a navegacao do browser. A criacao bloqueia envios
-duplicados, apresenta erros e permite nova tentativa. A renderizacao das
-perguntas permanece planejada para o proximo incremento.
+A aplicacao possui rotas para categorias, dificuldade e cada posicao da
+tentativa. As escolhas de configuracao ficam nos parametros da URL, preservando
+o estado ao avancar, voltar ou usar a navegacao do browser. Depois da criacao, a
+tentativa e carregada pela API, permitindo abrir ou atualizar diretamente a URL
+de uma pergunta. O frontend restaura respostas salvas, bloqueia envios
+duplicados, apresenta erros com retry e salva a alternativa antes de avancar. A
+conclusao da tentativa permanece planejada para o proximo incremento.
 
 ## Decisoes do frontend
 
@@ -130,7 +133,8 @@ autenticacao.
 Categorias e dificuldade usam query parameters enquanto a pessoa configura o
 quiz. Isso torna as etapas navegaveis, preserva as escolhas no historico do
 browser e evita um store global para um estado curto. Depois da criacao, o ID da
-tentativa passa a fazer parte do caminho `/quiz-attempts/{id}`.
+tentativa e a posicao passam a fazer parte do caminho
+`/quiz-attempts/{id}/questions/{position}`.
 
 ### Risco residual do React Router
 

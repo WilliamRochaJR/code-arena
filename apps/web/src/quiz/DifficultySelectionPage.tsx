@@ -50,10 +50,7 @@ export function DifficultySelectionPage({
     mutationFn: (difficulty: QuizDifficulty) =>
       client.attempts.create({ difficulty, categories }),
     onSuccess: (attempt) => {
-      navigate(`/quiz-attempts/${attempt.id}`, {
-        state: { attempt },
-        replace: true,
-      })
+      navigate(`/quiz-attempts/${attempt.id}/questions/1`, { replace: true })
     },
   })
 
