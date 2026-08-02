@@ -15,6 +15,7 @@ rg --files <diretorios>
 rg -n -C <linhas-de-contexto> "<padrao>" <arquivos-ou-diretorios>
 find <diretorio> -maxdepth <niveis> -type f -print
 sed -n '<inicio>,<fim>p' <arquivo>
+nl -ba <arquivo> | sed -n '<inicio>,<fim>p'
 tail -n <quantidade> <arquivo>
 ```
 
@@ -22,6 +23,8 @@ tail -n <quantidade> <arquivo>
 - `rg -n` pesquisa texto, mostra numeros de linha e adiciona contexto com `-C`.
 - `find` permite filtrar por tipo e limitar a profundidade da arvore.
 - `sed -n` le somente um intervalo.
+- `nl -ba` numera inclusive linhas vazias, facilitando relacionar erros a um
+  trecho exato; combine com `sed -n` para limitar a saida.
 - `tail` mostra as ultimas linhas, sendo util para logs.
 
 ## Contar linhas

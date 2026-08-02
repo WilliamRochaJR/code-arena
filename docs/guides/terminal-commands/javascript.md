@@ -48,6 +48,17 @@ npm run build
 
 Verifica Prettier, ESLint, tipos, testes e build dos workspaces aplicaveis.
 
+Para listar os scripts disponiveis ou executar um check isolado de um
+workspace:
+
+```bash
+npm run --workspace <workspace>
+npm run <script> --workspace <workspace>
+```
+
+No Code Arena, `format:check` existe somente na raiz; lint, typecheck, testes e
+build tambem podem ser executados no workspace durante o desenvolvimento.
+
 ## Formatar arquivos
 
 ```bash

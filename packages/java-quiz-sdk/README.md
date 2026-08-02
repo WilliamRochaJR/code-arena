@@ -14,10 +14,12 @@ nem use `fetch` diretamente.
 
 ## Estado implementado
 
-| Recurso    | Operacao            | Endpoint                     | Estado |
-| ---------- | ------------------- | ---------------------------- | ------ |
-| Categorias | `categories.list()` | `GET /api/v1/categories`     | Em uso |
-| Tentativas | `attempts.create()` | `POST /api/v1/quiz-attempts` | Em uso |
+| Recurso    | Operacao                | Endpoint                                             | Estado     |
+| ---------- | ----------------------- | ---------------------------------------------------- | ---------- |
+| Categorias | `categories.list()`     | `GET /api/v1/categories`                             | Em uso     |
+| Tentativas | `attempts.create()`     | `POST /api/v1/quiz-attempts`                         | Em uso     |
+| Tentativas | `attempts.get()`        | `GET /api/v1/quiz-attempts/{attemptId}`              | Disponivel |
+| Respostas  | `attempts.saveAnswer()` | `PUT /api/v1/quiz-attempts/{attemptId}/answers/{id}` | Disponivel |
 
 ## Uso
 
@@ -40,6 +42,21 @@ const attempt = await client.attempts.create({
   categories: ['OOP', 'COLLECTIONS'],
 })
 ```
+
+Para carregar a tentativa e salvar a resposta selecionada:
+
+```ts
+const details = await client.attempts.get(attempt.id)
+const question = details.questions[0]
+
+await client.attempts.saveAnswer(attempt.id, question.id, {
+  selectedAlternativeId: question.alternatives[0].id,
+})
+```
+
+Os detalhes de uma tentativa em andamento nao incluem gabarito, indicador de
+acerto ou explicacao. Essas informacoes permanecem protegidas pela API ate a
+conclusao.
 
 O `tokenProvider` e opcional para permitir o perfil local com identidade
 controlada. Em ambientes autenticados, ele deve fornecer somente o access token.

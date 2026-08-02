@@ -24,6 +24,40 @@ export interface QuizAttemptSummary {
   startedAt: string
 }
 
+export interface QuizAlternative {
+  id: string
+  text: string
+}
+
+export interface QuizQuestion {
+  id: string
+  position: number
+  statement: string
+  categories: string[]
+  alternatives: QuizAlternative[]
+  selectedAlternativeId: string | null
+}
+
+export interface QuizAttemptDetails {
+  id: string
+  status: 'IN_PROGRESS'
+  difficulty: QuizDifficulty
+  totalQuestions: number
+  answeredQuestions: number
+  startedAt: string
+  questions: QuizQuestion[]
+}
+
+export interface SaveQuizAnswerRequest {
+  selectedAlternativeId: string
+}
+
+export interface SavedQuizAnswer {
+  questionId: string
+  selectedAlternativeId: string
+  answeredAt: string
+}
+
 export interface ProblemDetail {
   type?: string
   title?: string
@@ -50,6 +84,14 @@ export interface CreateQuizAttemptOptions {
   signal?: AbortSignal
 }
 
+export interface GetQuizAttemptOptions {
+  signal?: AbortSignal
+}
+
+export interface SaveQuizAnswerOptions {
+  signal?: AbortSignal
+}
+
 export interface JavaQuizClient {
   categories: {
     list(options?: ListCategoriesOptions): Promise<CategoryList>
@@ -59,5 +101,15 @@ export interface JavaQuizClient {
       request: CreateQuizAttemptRequest,
       options?: CreateQuizAttemptOptions,
     ): Promise<QuizAttemptSummary>
+    get(
+      attemptId: string,
+      options?: GetQuizAttemptOptions,
+    ): Promise<QuizAttemptDetails>
+    saveAnswer(
+      attemptId: string,
+      questionId: string,
+      request: SaveQuizAnswerRequest,
+      options?: SaveQuizAnswerOptions,
+    ): Promise<SavedQuizAnswer>
   }
 }

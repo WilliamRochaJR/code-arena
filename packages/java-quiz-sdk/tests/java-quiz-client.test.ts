@@ -115,6 +115,101 @@ describe('createJavaQuizClient', () => {
     ).rejects.toBeInstanceOf(JavaQuizInvalidResponseError)
   })
 
+  it('gets a quiz attempt without exposing answer correctness', async () => {
+    const attempt = {
+      id: 'df34978a-2024-4234-9ba8-1af6cf7af994',
+      status: 'IN_PROGRESS' as const,
+      difficulty: 'INTERMEDIATE' as const,
+      totalQuestions: 1,
+      answeredQuestions: 0,
+      startedAt: '2026-07-22T18:30:00Z',
+      questions: [
+        {
+          id: '41b42e76-7657-4d31-ae42-f47a31dd18ca',
+          position: 1,
+          statement: 'Qual interface representa uma lista ordenada?',
+          categories: ['COLLECTIONS'],
+          alternatives: [
+            {
+              id: 'cc187215-c0f2-44a6-803f-392fbd21a2df',
+              text: 'List',
+            },
+          ],
+          selectedAlternativeId: null,
+        },
+      ],
+    }
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(Response.json(attempt))
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      fetch: fetchMock,
+    })
+
+    await expect(client.attempts.get(attempt.id)).resolves.toEqual(attempt)
+    expect(fetchMock).toHaveBeenCalledWith(
+      `http://localhost:8080/api/v1/quiz-attempts/${attempt.id}`,
+      expect.objectContaining({ method: 'GET' }),
+    )
+  })
+
+  it('saves a quiz answer with a PUT request', async () => {
+    const savedAnswer = {
+      questionId: '41b42e76-7657-4d31-ae42-f47a31dd18ca',
+      selectedAlternativeId: 'cc187215-c0f2-44a6-803f-392fbd21a2df',
+      answeredAt: '2026-07-22T18:32:00Z',
+    }
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(Response.json(savedAnswer))
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      fetch: fetchMock,
+    })
+
+    await expect(
+      client.attempts.saveAnswer(
+        'df34978a-2024-4234-9ba8-1af6cf7af994',
+        savedAnswer.questionId,
+        { selectedAlternativeId: savedAnswer.selectedAlternativeId },
+      ),
+    ).resolves.toEqual(savedAnswer)
+    expect(fetchMock).toHaveBeenCalledWith(
+      `http://localhost:8080/api/v1/quiz-attempts/df34978a-2024-4234-9ba8-1af6cf7af994/answers/${savedAnswer.questionId}`,
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({
+          selectedAlternativeId: savedAnswer.selectedAlternativeId,
+        }),
+      }),
+    )
+  })
+
+  it('rejects invalid quiz attempt details and saved answers', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json({ id: 'attempt-with-missing-fields' }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({ questionId: 'question-with-missing-fields' }),
+      )
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      fetch: fetchMock,
+    })
+
+    await expect(client.attempts.get('attempt-id')).rejects.toBeInstanceOf(
+      JavaQuizInvalidResponseError,
+    )
+    await expect(
+      client.attempts.saveAnswer('attempt-id', 'question-id', {
+        selectedAlternativeId: 'alternative-id',
+      }),
+    ).rejects.toBeInstanceOf(JavaQuizInvalidResponseError)
+  })
+
   it('rejects invalid successful responses', async () => {
     const client = createJavaQuizClient({
       baseUrl: 'http://localhost:8080',
