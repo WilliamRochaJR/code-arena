@@ -7,14 +7,34 @@ o Authorization Code Flow com PKCE e mantem o estado da sessao por meio da
 biblioteca de autenticacao escolhida. A API Spring Boot atua somente como OAuth2
 Resource Server.
 
-```text
-React --> Cognito --> Google
-  ^          |
-  |          | authorization code / tokens
-  `----------'
+O diagrama representa o fluxo alvo. A aplicacao e a API ja possuem as fronteiras
+de integracao, enquanto Cognito e Google ainda dependem do provisionamento AWS.
 
-React --> SDK --> Spring Boot
-                  Authorization: Bearer <access token>
+```mermaid
+sequenceDiagram
+    actor User as Pessoa usuaria
+    participant Web as React
+    participant Cognito as Amazon Cognito
+    participant Google as Google
+    participant SDK as Java Quiz SDK
+    participant API as Spring Boot API
+
+    User->>Web: Entrar com Google
+    Web->>Cognito: Authorization Code com PKCE
+    Cognito->>Google: Solicitar autenticacao
+    Google-->>Cognito: Identidade confirmada
+    Cognito-->>Web: Authorization code
+    Web->>Cognito: Code e PKCE verifier
+    Cognito-->>Web: Access, ID e refresh tokens
+    Web->>SDK: Fornecer somente o access token
+    SDK->>API: Authorization Bearer access token
+    API-->>SDK: Resposta do recurso do usuario
+
+    alt API responde 401
+        SDK-->>Web: Notificar sessao nao autorizada
+        Web->>Web: Remover sessao local
+        Web-->>User: Solicitar novo login
+    end
 ```
 
 Nenhum client secret e armazenado no navegador. A API nao cria uma sessao HTTP
@@ -43,8 +63,8 @@ const client = new JavaQuizClient({
 ```
 
 O `authService` coordena a renovacao para que requisicoes concorrentes aguardem
-uma unica operacao. Uma requisicao pode ser repetida no maximo uma vez depois da
-renovacao; uma nova resposta `401` encerra a sessao para evitar loops.
+uma unica operacao antes de chamar a API. Uma resposta `401` encerra a sessao
+local e a requisicao nao e repetida automaticamente, evitando loops.
 
 ## Validacao no backend
 
