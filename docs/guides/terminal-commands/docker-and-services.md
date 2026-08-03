@@ -1,5 +1,34 @@
 # Docker e servicos locais
 
+## Construir uma imagem
+
+```bash
+docker build -t <imagem>:<tag> <contexto>
+```
+
+Executa o Dockerfile do contexto informado e atribui um nome e tag a imagem. O
+contexto deve conter apenas os arquivos necessarios para o build; em um
+monorepositorio, ele tambem precisa incluir os workspaces consumidos.
+
+## Inspecionar configuracoes de uma imagem
+
+```bash
+docker image inspect <imagem>:<tag> \
+  --format '{{.Id}} | user={{.Config.User}} | health={{json .Config.Healthcheck.Test}}'
+```
+
+Confirma a identidade da imagem, o usuario configurado e o comando de
+healthcheck sem iniciar a aplicacao.
+
+## Executar um comando isolado na imagem
+
+```bash
+docker run --rm --entrypoint <executavel> <imagem>:<tag> <argumentos>
+```
+
+Substitui temporariamente o entrypoint para validar um executavel do runtime. O
+container e removido automaticamente ao terminar.
+
 Execute o Compose na raiz do repositorio.
 
 ## Validar o Compose
