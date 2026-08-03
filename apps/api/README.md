@@ -77,7 +77,18 @@ O bootstrap expoe:
 Health e metricas sao publicos nesta fundacao para permitir verificacoes locais.
 Nos perfis `local` e `test`, `/api/v1/**` usa uma identidade controlada e fica
 acessivel sem token para permitir a implementacao incremental do fluxo. No
-perfil padrao, esses endpoints continuam negados ate a integracao com Cognito.
+perfil padrao, esses endpoints exigem um access token JWT do Cognito. Configure
+o emissor e o App Client por ambiente, sem versionar valores reais:
+
+```bash
+COGNITO_ISSUER_URI=<issuer-do-user-pool>
+COGNITO_CLIENT_ID=<id-publico-do-app-client>
+```
+
+A API valida assinatura, emissor, validade, `token_use=access` e `client_id`.
+Somente `sub` e obrigatorio para identificar o usuario; o access token padrao do
+Cognito pode nao conter e-mail nem nome. O perfil local continua independente
+da AWS.
 
 Logs usam SLF4J com Logback e sao escritos no console. Tokens, credenciais e
 outros dados sensiveis nao devem ser registrados.
@@ -110,10 +121,11 @@ Os contratos completos, incluindo parametros de paginacao e exemplos, estao em
 
 O Flyway aplica as migrations em ordem ao iniciar a aplicacao:
 
-| Migration                        | Estado | Finalidade                                      |
-| -------------------------------- | ------ | ----------------------------------------------- |
-| `V1__create_quiz_domain.sql`     | Em uso | Cria tabelas, relacionamentos, indices e regras |
-| `V2__seed_java_quiz_catalog.sql` | Em uso | Carrega o catalogo inicial de perguntas Java    |
+| Migration                                  | Estado | Finalidade                                      |
+| ------------------------------------------ | ------ | ----------------------------------------------- |
+| `V1__create_quiz_domain.sql`               | Em uso | Cria tabelas, relacionamentos, indices e regras |
+| `V2__seed_java_quiz_catalog.sql`           | Em uso | Carrega o catalogo inicial de perguntas Java    |
+| `V3__allow_user_without_profile_email.sql` | Em uso | Permite perfil identificado somente por `sub`   |
 
 O catalogo inicial possui tres categorias (`OOP`, `COLLECTIONS` e `STREAMS`),
 36 questoes e 144 alternativas. Cada uma das tres dificuldades possui opcoes
