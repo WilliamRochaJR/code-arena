@@ -26,6 +26,108 @@ posicao e a resposta atual. O MVP nao usa uma tabela `answer` separada: selecion
 ou trocar uma alternativa atualiza `selected_alternative_id` e `answered_at`
 nesse registro.
 
+## Entidades Java
+
+O `classDiagram` apresenta as entidades JPA implementadas, seus atributos mais
+relevantes e os comportamentos que alteram o estado do dominio. Ele complementa
+o modelo relacional: nao substitui as constraints detalhadas nas secoes
+seguintes.
+
+```mermaid
+---
+config:
+  class:
+    defaultRenderer: elk
+---
+classDiagram
+    class AppUser {
+        UUID id
+        String identityProviderSubject
+        String email
+        String displayName
+        OffsetDateTime createdAt
+        OffsetDateTime lastLoginAt
+    }
+
+    class QuizAttempt {
+        UUID id
+        Difficulty difficulty
+        QuizAttemptStatus status
+        short totalQuestions
+        Short correctAnswers
+        BigDecimal score
+        OffsetDateTime startedAt
+        OffsetDateTime completedAt
+        complete(correctAnswers, score, completedAt)
+    }
+
+    class AttemptQuestion {
+        UUID id
+        short position
+        UUID selectedAlternativeId
+        Boolean correct
+        OffsetDateTime answeredAt
+        answerWith(alternativeId, answeredAt)
+        markCorrect(correct)
+    }
+
+    class Question {
+        UUID id
+        String statement
+        Difficulty difficulty
+        String explanation
+        boolean active
+    }
+
+    class Alternative {
+        UUID id
+        String text
+        boolean correct
+        short displayOrder
+    }
+
+    class Category {
+        UUID id
+        String slug
+        String name
+        boolean active
+    }
+
+    class QuestionCategory
+    class QuizAttemptCategory
+
+    class Difficulty {
+        <<enumeration>>
+        BEGINNER
+        INTERMEDIATE
+        ADVANCED
+    }
+
+    class QuizAttemptStatus {
+        <<enumeration>>
+        IN_PROGRESS
+        COMPLETED
+    }
+
+    AppUser "1" --> "0..*" QuizAttempt : realiza — exatamente um para zero ou muitos
+    QuizAttempt "1" --> "1..*" AttemptQuestion : contém — exatamente um para um ou muitos
+    AttemptQuestion "0..*" --> "1" Question : apresenta — zero ou muitos para exatamente um
+    AttemptQuestion "0..*" --> "0..1" Alternative : seleciona — zero ou muitos para zero ou um
+    Question "1" --> "2..*" Alternative : possui — exatamente um para dois ou muitos
+    Question "1" --> "0..*" QuestionCategory : classifica — exatamente um para zero ou muitos
+    Category "1" --> "0..*" QuestionCategory : participa — exatamente um para zero ou muitos
+    QuizAttempt "1" --> "1..*" QuizAttemptCategory : filtra por — exatamente um para um ou muitos
+    Category "1" --> "0..*" QuizAttemptCategory : participa — exatamente um para zero ou muitos
+    Question --> Difficulty
+    QuizAttempt --> Difficulty
+    QuizAttempt --> QuizAttemptStatus
+```
+
+As classes associativas `QuestionCategory` e `QuizAttemptCategory` tornam
+explicitos os relacionamentos muitos-para-muitos. Os respectivos IDs compostos
+sao detalhes de persistencia e foram omitidos do diagrama para preservar a
+leitura da logica do dominio.
+
 ## Convencoes fisicas
 
 - Tabelas e colunas usam `snake_case` e nomes de tabelas no plural.
