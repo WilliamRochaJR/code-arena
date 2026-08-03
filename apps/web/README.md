@@ -48,18 +48,18 @@ As versoes exatas resolvidas ficam em [`package-lock.json`](../../package-lock.j
 
 ## Bibliotecas instaladas e planejadas
 
-| Biblioteca            | Finalidade                                      | Instalada | Em uso | Estado ou momento de adocao                |
-| --------------------- | ----------------------------------------------- | --------- | ------ | ------------------------------------------ |
-| Java Quiz SDK         | Cliente REST e contratos TypeScript             | Sim       | Sim    | Quiz completo e resultados                 |
-| TanStack Query        | Cache, sincronizacao e estado remoto            | Sim       | Sim    | Quiz, conclusao e resultado                |
-| React Testing Library | Testes pela perspectiva de quem usa a interface | Sim       | Sim    | Configuracao e execucao da tentativa       |
-| user-event            | Simulacao de interacoes reais nos testes        | Sim       | Sim    | Selecao, retry, salvamento e navegacao     |
-| jest-dom              | Matchers semanticos para elementos do DOM       | Sim       | Sim    | Assercoes dos testes de componentes        |
-| jsdom                 | Ambiente de navegador para testes no Vitest     | Sim       | Sim    | Execucao dos testes React                  |
-| React Router          | Navegacao declarativa entre etapas              | Sim       | Sim    | Configuracao e perguntas por posicao       |
-| React Hook Form       | Estado e submissao de formularios               | Nao       | Nao    | Nos formularios do MVP                     |
-| Zod                   | Validacao de dados e schemas no frontend        | Nao       | Nao    | Nos formularios que exigirem validacao     |
-| Playwright            | Testes ponta a ponta no navegador               | Nao       | Nao    | Quando existir um fluxo completo e estavel |
+| Biblioteca            | Finalidade                                      | Instalada | Em uso | Estado ou momento de adocao            |
+| --------------------- | ----------------------------------------------- | --------- | ------ | -------------------------------------- |
+| Java Quiz SDK         | Cliente REST e contratos TypeScript             | Sim       | Sim    | Quiz completo e resultados             |
+| TanStack Query        | Cache, sincronizacao e estado remoto            | Sim       | Sim    | Quiz, conclusao e resultado            |
+| React Testing Library | Testes pela perspectiva de quem usa a interface | Sim       | Sim    | Configuracao e execucao da tentativa   |
+| user-event            | Simulacao de interacoes reais nos testes        | Sim       | Sim    | Selecao, retry, salvamento e navegacao |
+| jest-dom              | Matchers semanticos para elementos do DOM       | Sim       | Sim    | Assercoes dos testes de componentes    |
+| jsdom                 | Ambiente de navegador para testes no Vitest     | Sim       | Sim    | Execucao dos testes React              |
+| React Router          | Navegacao declarativa entre etapas              | Sim       | Sim    | Configuracao e perguntas por posicao   |
+| React Hook Form       | Estado e submissao de formularios               | Nao       | Nao    | Nos formularios do MVP                 |
+| Zod                   | Validacao de dados e schemas no frontend        | Nao       | Nao    | Nos formularios que exigirem validacao |
+| Playwright            | Testes ponta a ponta no navegador               | Sim       | Sim    | Fluxo completo do quiz em Chromium     |
 
 As colunas `Instalada` e `Em uso` diferenciam uma dependencia presente no
 projeto de uma dependencia realmente adotada pelo codigo. A tabela deve ser
