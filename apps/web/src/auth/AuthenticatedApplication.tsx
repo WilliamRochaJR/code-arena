@@ -10,9 +10,10 @@ export function AuthenticatedApplication() {
     () =>
       createJavaQuizClient({
         baseUrl: import.meta.env.VITE_API_URL ?? window.location.origin,
+        onUnauthorized: session.handleUnauthorized,
         tokenProvider: session.getAccessToken,
       }),
-    [session.getAccessToken],
+    [session.getAccessToken, session.handleUnauthorized],
   )
 
   if (session.isLoading) {

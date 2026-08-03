@@ -59,6 +59,38 @@ describe('createJavaQuizClient', () => {
     })
   })
 
+  it('notifies the application when the API rejects the session', async () => {
+    const onUnauthorized = vi.fn().mockResolvedValue(undefined)
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      onUnauthorized,
+      tokenProvider: () => 'expired-access-token',
+      fetch: vi
+        .fn<typeof fetch>()
+        .mockResolvedValue(new Response(null, { status: 401 })),
+    })
+
+    await expect(client.categories.list()).rejects.toMatchObject({
+      status: 401,
+    })
+    expect(onUnauthorized).toHaveBeenCalledOnce()
+  })
+
+  it('preserves the HTTP error when unauthorized cleanup fails', async () => {
+    const client = createJavaQuizClient({
+      baseUrl: 'http://localhost:8080',
+      onUnauthorized: () => Promise.reject(new Error('cleanup failed')),
+      fetch: vi
+        .fn<typeof fetch>()
+        .mockResolvedValue(new Response(null, { status: 401 })),
+    })
+
+    await expect(client.categories.list()).rejects.toMatchObject({
+      name: 'JavaQuizHttpError',
+      status: 401,
+    })
+  })
+
   it('creates a quiz attempt with a JSON body', async () => {
     const attempt = {
       id: 'df34978a-2024-4234-9ba8-1af6cf7af994',

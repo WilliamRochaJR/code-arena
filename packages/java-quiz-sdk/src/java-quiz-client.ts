@@ -87,6 +87,13 @@ export function createJavaQuizClient(
           : { body: JSON.stringify(requestOptions.body) }),
       })
       if (!response.ok) {
+        if (response.status === 401) {
+          try {
+            await options.onUnauthorized?.()
+          } catch {
+            // Session cleanup must not hide the API response.
+          }
+        }
         throw new JavaQuizHttpError(
           response.status,
           await readProblemDetail(response),

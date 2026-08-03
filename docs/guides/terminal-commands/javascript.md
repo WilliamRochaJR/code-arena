@@ -73,6 +73,17 @@ npm run <script> --workspace <workspace>
 No Code Arena, `format:check` existe somente na raiz; lint, typecheck, testes e
 build tambem podem ser executados no workspace durante o desenvolvimento.
 
+Para executar somente um arquivo de teste, informe o caminho relativo ao
+workspace, e nao a raiz do monorepositorio:
+
+```bash
+npm test --workspace <workspace> -- --run <caminho-relativo-ao-workspace>
+```
+
+Por exemplo, `tests/client.test.ts` para um SDK ou `src/auth/session.test.tsx`
+para a aplicacao web. Um caminho relativo a raiz pode nao encontrar testes,
+pois cada Vitest usa o diretorio do proprio workspace.
+
 ## Formatar arquivos
 
 ```bash

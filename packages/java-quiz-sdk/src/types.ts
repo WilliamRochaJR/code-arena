@@ -117,6 +117,7 @@ export type TokenProvider = () => Promise<string | null> | string | null
 
 export interface JavaQuizClientOptions {
   baseUrl: string
+  onUnauthorized?: () => Promise<void> | void
   tokenProvider?: TokenProvider
   timeoutMs?: number
   fetch?: typeof globalThis.fetch

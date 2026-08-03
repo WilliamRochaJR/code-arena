@@ -9,6 +9,7 @@ export interface AuthenticatedUser {
 export interface AuthSession {
   error: Error | null
   getAccessToken(): Promise<string | null>
+  handleUnauthorized(): Promise<void>
   isAuthenticated: boolean
   isLoading: boolean
   signIn(): Promise<void>
