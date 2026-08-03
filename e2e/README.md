@@ -12,3 +12,9 @@ ID pela navegacao, sem depender dos registros deixados por execucoes anteriores.
 Em falhas, Playwright preserva trace, screenshot e video em `test-results/` e
 gera o relatorio HTML em `playwright-report/`. Esses diretorios sao artefatos
 locais e nao devem ser versionados.
+
+No workflow de Pull Request, o job `End-to-end` monta PostgreSQL, API e web com
+Docker Compose e executa o mesmo cenario em Chromium. Quando o teste falha, os
+logs dos containers e os artefatos do Playwright ficam disponiveis por sete dias
+na execucao do GitHub Actions. Os containers e volumes da execucao sao removidos
+mesmo quando uma etapa falha.

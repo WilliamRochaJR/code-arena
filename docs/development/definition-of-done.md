@@ -21,6 +21,7 @@ aplicaveis abaixo forem atendidos.
 
 - Testes relevantes cobrem sucesso, falhas e casos de borda.
 - Um bug corrigido possui teste de regressao quando viavel.
+- O fluxo E2E aplicavel passa em um navegador real.
 - Lint, formatacao, typecheck, testes e builds aplicaveis passam.
 - O diff foi revisado e nao contem alteracoes acidentais.
 
