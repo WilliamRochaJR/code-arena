@@ -48,16 +48,27 @@ padrao. A API nao deve depender de arquivos de log dentro do container. Senhas,
 tokens, credenciais, cabecalhos de autorizacao e outros dados sensiveis nunca
 devem ser registrados.
 
-## Metricas e dashboards locais
+## Metricas locais
 
-Em uma entrega posterior, o Docker Compose local incluira:
+O Docker Compose local inclui Prometheus para coletar periodicamente o endpoint
+`/actuator/prometheus` da API. A configuracao versionada define o target pelo
+nome do servico na rede interna, sem depender da porta publicada no host.
 
-- Prometheus para coletar periodicamente o endpoint
-  `/actuator/prometheus`;
-- Grafana para consultar o Prometheus;
-- dashboard versionado com disponibilidade, latencia, volume de requisicoes,
-  respostas por status HTTP e metricas da JVM;
-- configuracoes reproduziveis de datasource e provisionamento.
+O armazenamento usa um volume nomeado para preservar as series entre reinicios
+locais. Essa retencao e destinada a diagnostico e estudo, nao representa uma
+politica de retencao de producao.
+
+## Dashboards locais
+
+O Grafana consulta o Prometheus por um datasource provisionado e carrega o
+dashboard versionado **Code Arena API** sem configuracao manual. O acesso local
+e anonimo e somente leitura; nao existem credenciais administrativas padrao no
+repositorio.
+
+O dashboard apresenta disponibilidade, volume e latencia media das requisicoes,
+respostas por status HTTP, memoria da JVM e conexoes do pool do banco. Percentis
+de latencia serao adicionados quando a API habilitar buckets de histograma; sem
+eles, uma consulta p95 nao teria dados confiaveis.
 
 Metricas de negocio, como tentativas iniciadas e concluidas, devem ser
 adicionadas quando os respectivos comportamentos existirem.

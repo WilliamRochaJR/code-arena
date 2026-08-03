@@ -32,7 +32,13 @@ Depois da inicializacao, acesse:
 
 - frontend: `http://localhost:3000`;
 - API: `http://localhost:8080`;
+- Prometheus: `http://localhost:9090`;
+- Grafana: `http://localhost:3001`;
 - PostgreSQL: `localhost:5433`.
+
+O Grafana permite acesso local anonimo somente para leitura. O datasource
+Prometheus e o dashboard **Code Arena API** sao provisionados automaticamente,
+sem credenciais ou configuracao manual.
 
 As migracoes Flyway sao aplicadas pela API durante a inicializacao. Os valores
 padrao servem exclusivamente para desenvolvimento local. Para alterar portas ou
