@@ -1,6 +1,57 @@
 # Docker e servicos locais
 
+## Construir uma imagem
+
+```bash
+docker build -t <imagem>:<tag> <contexto>
+```
+
+Executa o Dockerfile do contexto informado e atribui um nome e tag a imagem. O
+contexto deve conter apenas os arquivos necessarios para o build; em um
+monorepositorio, ele tambem precisa incluir os workspaces consumidos.
+
+Quando o Dockerfile nao esta na raiz do contexto, informe seu caminho:
+
+```bash
+docker build -f <caminho-do-Dockerfile> -t <imagem>:<tag> <contexto>
+```
+
+## Inspecionar configuracoes de uma imagem
+
+```bash
+docker image inspect <imagem>:<tag> \
+  --format '{{.Id}} | user={{.Config.User}} | health={{json .Config.Healthcheck.Test}}'
+```
+
+Confirma a identidade da imagem, o usuario configurado e o comando de
+healthcheck sem iniciar a aplicacao.
+
+## Executar um comando isolado na imagem
+
+```bash
+docker run --rm --entrypoint <executavel> <imagem>:<tag> <argumentos>
+```
+
+Substitui temporariamente o entrypoint para validar um executavel do runtime. O
+container e removido automaticamente ao terminar.
+
 Execute o Compose na raiz do repositorio.
+
+## Iniciar a aplicacao completa
+
+```bash
+docker compose up -d --build --wait
+```
+
+Constroi as imagens alteradas, inicia todos os servicos em segundo plano e
+aguarda seus healthchecks. As dependencias declaradas fazem PostgreSQL, API e
+frontend ficarem disponiveis nessa ordem.
+
+Para sobrescrever temporariamente uma variavel sem criar `.env`:
+
+```bash
+<VARIAVEL>=<valor> docker compose up -d --build --wait
+```
 
 ## Validar o Compose
 
@@ -29,6 +80,24 @@ docker ps \
 ```
 
 Inclui servicos parados e ajuda a localizar conflitos de porta.
+
+## Diagnosticar healthcheck
+
+```bash
+docker inspect <container> --format '{{json .State.Health}}'
+```
+
+Exibe estado, tentativas e mensagens do healthcheck. Use tambem a secao de logs
+abaixo para comparar a verificacao de saude com a inicializacao da aplicacao.
+
+## Identificar processo em uma porta
+
+```bash
+ss -ltnp 'sport = :<porta>'
+```
+
+Mostra o processo local que escuta na porta. Se o processo nao for um container
+do projeto, nao o encerre antes de confirmar sua finalidade.
 
 ## Ler logs
 

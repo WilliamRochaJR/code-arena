@@ -51,6 +51,20 @@ local `5433`. A porta `5432` permanece interna ao container. As credenciais
 padrao do Compose servem somente para desenvolvimento local e podem ser
 substituidas por `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`.
 
+## Imagem Docker
+
+Na raiz do repositorio, construa a imagem multi-stage:
+
+```bash
+docker build -t code-arena-api:local apps/api
+```
+
+O primeiro estagio usa o Maven Wrapper e Java 21 para gerar o jar. O runtime
+contem somente o Java 21 necessario para executar a aplicacao, usa um usuario
+sem privilegios e verifica `/actuator/health/readiness`. Testes permanecem fora
+do build da imagem porque `./mvnw verify` e executado previamente na validacao da
+entrega.
+
 ## Observabilidade
 
 O bootstrap expoe:

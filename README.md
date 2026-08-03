@@ -19,3 +19,26 @@ uma biblioteca de componentes e uma API Java 21 com Spring Boot.
 
 Consulte o [indice da documentacao](docs/README.md) para acompanhar produto,
 arquitetura, contratos, decisoes, qualidade e processo de desenvolvimento.
+
+## Executar localmente com Docker
+
+O Compose inicia PostgreSQL, API e frontend, nessa ordem, usando healthchecks:
+
+```bash
+docker compose up -d --build --wait
+```
+
+Depois da inicializacao, acesse:
+
+- frontend: `http://localhost:3000`;
+- API: `http://localhost:8080`;
+- PostgreSQL: `localhost:5433`.
+
+As migracoes Flyway sao aplicadas pela API durante a inicializacao. Os valores
+padrao servem exclusivamente para desenvolvimento local. Para alterar portas ou
+credenciais, copie `.env.example` para `.env`; o arquivo `.env` e ignorado pelo
+Git. Encerre os servicos preservando os dados com:
+
+```bash
+docker compose down
+```
