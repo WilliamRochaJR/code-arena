@@ -48,6 +48,29 @@ class QuizPersistenceMigrationTests {
 	}
 
 	@Test
+	void allowsUserWithoutProfileEmail() {
+		UUID userId = UUID.randomUUID();
+		OffsetDateTime now = OffsetDateTime.now();
+
+		int insertedRows = jdbcTemplate.update("""
+			INSERT INTO app_users (
+			    id,
+			    identity_provider_subject,
+			    email,
+			    created_at,
+			    last_login_at
+			)
+			VALUES (?, ?, NULL, ?, ?)
+			""",
+			userId,
+			"subject-" + userId,
+			now,
+			now);
+
+		assertThat(insertedRows).isOne();
+	}
+
+	@Test
 	void rejectsCompletedAttemptWithoutPersistedResult() {
 		UUID userId = insertUser();
 
