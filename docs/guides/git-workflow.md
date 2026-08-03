@@ -1,13 +1,32 @@
 # Fluxo de trabalho com Git
 
-Este guia descreve o Git Flow simplificado do Code Arena. As setas usadas na
-documentacao representam a direcao de um Pull Request, nao comandos de terminal.
+Este guia descreve o Git Flow simplificado do Code Arena. Os rotulos das setas
+diferenciam a criacao de uma branch da direcao de um Pull Request.
 
-```text
-feature/* --> develop --> release/* --> main
-                    ^                    |
-                    `------ hotfix/* ----'
+```mermaid
+flowchart LR
+    Develop[develop] -->|criar a partir de| Work[feature/*, fix/*, docs/* ou chore/*]
+    Work -->|Pull Request| Develop
+
+    Develop -->|criar a partir de| Release[release/*]
+    Release -->|Pull Request| Main[main]
+    Release -->|incorporar correcoes da release| Develop
+    Main -->|release aprovada| Tag[tag anotada vX.Y.Z]
+
+    Main -.->|somente criacao inicial| Develop
+
+    Main -->|criar a partir de| Hotfix[hotfix/*]
+    Hotfix -->|Pull Request| Main
+    Hotfix -->|incorporar a correcao| Develop
+
+    classDef permanent stroke-width: 3px
+    class Main,Develop permanent
 ```
+
+`develop` nasce de `main` somente na configuracao inicial e depois permanece
+como branch permanente. Correcoes feitas em `release/*` ou `hotfix/*` retornam
+diretamente dessas branches para `develop`; nao se usa uma sincronizacao geral
+entre `main` e `develop` para substituir esses retornos explicitos.
 
 ## Branches permanentes
 
@@ -176,10 +195,16 @@ protecao de `main` e `develop` estao no
 
 As protecoes nao substituem a verificacao da direcao do Pull Request:
 
-```text
-feature/* --> develop
-release/* --> main
-hotfix/*  --> main
+```mermaid
+flowchart LR
+    Work[feature/*, fix/*, docs/* ou chore/*] -->|permitido| Develop[develop]
+    Release[release/*] -->|permitido| Main[main]
+    Hotfix[hotfix/*] -->|permitido| Main
+
+    BlockedWork[feature/*, fix/*, docs/* ou chore/*] -.->|bloqueado pela politica| Main
+
+    classDef blocked stroke:#c62828,color:#c62828,stroke-dasharray: 5 5
+    class BlockedWork blocked
 ```
 
 O check `Pull request policy` bloqueia tecnicamente qualquer origem diferente de

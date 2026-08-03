@@ -11,13 +11,41 @@ Workflow:
 
 ## Quando executa
 
-```text
-Pull Request --> develop
-Pull Request --> main
+```mermaid
+flowchart TD
+    Change[Commit em branch curta] --> PRDevelop[Pull Request para develop]
+    PRDevelop --> CI[Workflow Pull Request]
+
+    CI --> Policy[Pull request policy]
+    CI --> JS[JavaScript quality]
+    CI --> Java[Java quality]
+    CI --> E2E[End-to-end]
+
+    Policy --> Gate{Ruleset e checks aprovados?}
+    JS --> Gate
+    Java --> Gate
+    E2E --> Gate
+    Gate -->|base develop| Develop[Merge em develop]
+
+    Develop --> Release[Branch release/*]
+    Release --> PRMain[Pull Request para main]
+    PRMain --> CI
+    Gate -->|base main e origem release/*| Main[Merge em main]
+
+    Main -.->|CD planejado| Package[Empacotar artefatos e imagens]
+    Package -.->|OIDC planejado| AWS[Provisionar e publicar na AWS]
+    AWS -.-> Smoke[Smoke tests]
+
+    classDef planned stroke-dasharray: 5 5
+    class Package,AWS,Smoke planned
 ```
 
 Novos commits no mesmo PR cancelam a execucao anterior. Isso evita gastar tempo
 com uma revisao que ja foi substituida.
+
+As linhas continuas representam a integracao continua implementada. As linhas
+tracejadas representam o CD planejado; o repositorio ainda nao publica recursos
+na AWS automaticamente.
 
 ## Permissoes
 
@@ -52,18 +80,19 @@ actions/setup-java@v5
 
 ## Etapas
 
-O workflow possui tres jobs independentes:
+O workflow possui quatro jobs independentes:
 
-```text
-Pull request policy       JavaScript quality       Java quality
-        |                         |                     |
-testar politica                checkout              checkout
-        |                         |                     |
-validar base e origem         setup Node           setup Java 21
-                                  |                     |
-                               npm ci            Maven Wrapper verify
-                                  |
-                   format, lint, types, tests, build
+```mermaid
+flowchart LR
+    CI[Pull Request] --> Policy[Pull request policy]
+    CI --> JS[JavaScript quality]
+    CI --> Java[Java quality]
+    CI --> E2E[End-to-end]
+
+    Policy --> PolicySteps[Testar politica e validar branches]
+    JS --> JSSteps[npm ci, format, lint, types, testes e build]
+    Java --> JavaSteps[Java 21 e Maven Wrapper verify]
+    E2E --> E2ESteps[Compose, Playwright e evidencias de falha]
 ```
 
 `apps/web` consome `@code-arena/java-quiz-sdk` pelas exportacoes geradas em
@@ -74,7 +103,7 @@ reproduzivel na CI sem versionar arquivos gerados nem importar fontes internas
 do SDK diretamente.
 
 Separar os jobs permite distinguir uma violacao do fluxo de branches de uma
-falha de qualidade JavaScript ou Java.
+falha de qualidade JavaScript, Java ou do fluxo ponta a ponta.
 
 ### Politica do Pull Request
 
