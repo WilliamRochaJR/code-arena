@@ -18,7 +18,7 @@ public class AppUser {
 	@Column(name = "identity_provider_subject", nullable = false, unique = true, length = 255)
 	private String identityProviderSubject;
 
-	@Column(nullable = false, length = 320)
+	@Column(length = 320)
 	private String email;
 
 	@Column(name = "display_name", length = 120)

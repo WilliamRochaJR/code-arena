@@ -59,6 +59,11 @@ Antes de executar um endpoint protegido, o Spring Security valida:
 O identificador externo do usuario e a claim `sub`. E-mail pode mudar e nao deve
 ser usado como chave de integracao.
 
+O access token padrao do Cognito nao garante as claims de e-mail e nome. Por
+isso, somente `sub` e obrigatorio no perfil persistido pela API; e-mail e nome
+podem permanecer ausentes. A interface usa o ID token apenas para apresentacao e
+nao o envia como credencial da API.
+
 ## Usuario local
 
 Na primeira chamada autenticada, a API busca o usuario por `sub`. Se ainda nao

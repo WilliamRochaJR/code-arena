@@ -71,7 +71,7 @@ evita o nome reservado e ambiguo `user`.
 | --------------------------- | -------------- | ------- | -------------------------------- |
 | `id`                        | `uuid`         | nao     | PK                               |
 | `identity_provider_subject` | `varchar(255)` | nao     | unico e imutavel; claim `sub`    |
-| `email`                     | `varchar(320)` | nao     | contato; nao identifica recursos |
+| `email`                     | `varchar(320)` | sim     | contato; nao identifica recursos |
 | `display_name`              | `varchar(120)` | sim     | nome apresentado na interface    |
 | `created_at`                | `timestamptz`  | nao     | instante de criacao              |
 | `last_login_at`             | `timestamptz`  | nao     | ultima sincronizacao do perfil   |

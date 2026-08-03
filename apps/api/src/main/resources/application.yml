@@ -23,3 +23,9 @@ management:
 
 server:
   shutdown: graceful
+
+code-arena:
+  security:
+    cognito:
+      client-id: ${COGNITO_CLIENT_ID:}
+      issuer-uri: ${COGNITO_ISSUER_URI:}
