@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -16,6 +17,7 @@ import com.williamrocha.codearena.identity.CurrentUserProvider;
 import com.williamrocha.codearena.identity.JwtCurrentUserProvider;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,6 +40,26 @@ class JwtSecurityIntegrationTests {
 	@Test
 	void rejectsApiRequestWithoutAccessToken() throws Exception {
 		mockMvc.perform(get("/api/v1/security/current-user"))
+			.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	void rejectsInvalidAccessToken() throws Exception {
+		when(jwtDecoder.decode("invalid-token"))
+			.thenThrow(new BadJwtException("Invalid token"));
+
+		mockMvc.perform(get("/api/v1/security/current-user")
+				.header("Authorization", "Bearer invalid-token"))
+			.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	void rejectsExpiredAccessToken() throws Exception {
+		when(jwtDecoder.decode("expired-token"))
+			.thenThrow(new BadJwtException("Token expired"));
+
+		mockMvc.perform(get("/api/v1/security/current-user")
+				.header("Authorization", "Bearer expired-token"))
 			.andExpect(status().isUnauthorized());
 	}
 

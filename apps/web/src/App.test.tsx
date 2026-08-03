@@ -13,6 +13,7 @@ import type {
 } from '@code-arena/java-quiz-sdk'
 
 import App from './App'
+import type { AuthSession } from './auth/types'
 
 const ATTEMPT: QuizAttemptSummary = {
   id: 'df34978a-2024-4234-9ba8-1af6cf7af994',
@@ -140,20 +141,48 @@ function createClient(
   }
 }
 
-function renderApp(client: JavaQuizClient, initialEntry = '/quiz/categories') {
+function renderApp(
+  client: JavaQuizClient,
+  initialEntry = '/quiz/categories',
+  session?: AuthSession,
+) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   })
   return render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={[initialEntry]}>
-        <App client={client} />
+        <App client={client} {...(session ? { session } : {})} />
       </MemoryRouter>
     </QueryClientProvider>,
   )
 }
 
 describe('App', () => {
+  it('ends the authenticated session from the application header', async () => {
+    const user = userEvent.setup()
+    const signOut = vi.fn<AuthSession['signOut']>().mockResolvedValue()
+    const session: AuthSession = {
+      error: null,
+      getAccessToken: async () => 'access-token',
+      handleUnauthorized: async () => undefined,
+      isAuthenticated: true,
+      isLoading: false,
+      signIn: async () => undefined,
+      signOut,
+      user: {
+        subject: 'user-subject',
+        displayName: 'Code Arena Developer',
+        email: 'developer@example.com',
+      },
+    }
+    renderApp(createClient(), '/quiz/categories', session)
+
+    await user.click(screen.getByRole('button', { name: 'Sair' }))
+
+    expect(signOut).toHaveBeenCalledOnce()
+  })
+
   it('shows loading and then the available categories', async () => {
     renderApp(
       createClient(

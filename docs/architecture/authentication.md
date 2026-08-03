@@ -98,6 +98,11 @@ O MVP possui o papel `USER`, com acesso apenas aos proprios recursos. O papel
 As verificacoes de propriedade acontecem no backend. Rotas protegidas no React
 melhoram a navegacao, mas nao constituem controle de seguranca.
 
+No MVP, tentativas de outro usuario sao respondidas como `404 Not Found` para
+evitar enumeracao de recursos. Como existe somente o papel `USER` e nenhuma
+operacao adicional baseada em permissao, ainda nao ha um cenario funcional em
+que uma identidade valida deva receber `403 Forbidden`.
+
 ## Respostas de seguranca
 
 - `401 Unauthorized`: token ausente, invalido ou expirado.
@@ -107,10 +112,11 @@ melhoram a navegacao, mas nao constituem controle de seguranca.
 
 ## Desenvolvimento local
 
-A integracao real com Cognito sera adicionada depois que o dominio do quiz
-funcionar. Nos perfis `local` e `test`, a API fornece uma identidade controlada
-pela abstracao `CurrentUserProvider` e permite acesso a `/api/v1/**` sem token.
-Os valores locais podem ser substituidos por `CONTROLLED_USER_SUBJECT`,
+A integracao com Cognito esta preparada por configuracao externa, mas ainda
+depende do provisionamento AWS para ser exercitada com usuarios reais. Nos
+perfis `local` e `test`, a API fornece uma identidade controlada pela abstracao
+`CurrentUserProvider` e permite acesso a `/api/v1/**` sem token. Os valores
+locais podem ser substituidos por `CONTROLLED_USER_SUBJECT`,
 `CONTROLLED_USER_EMAIL` e `CONTROLLED_USER_DISPLAY_NAME`.
 
 Esse mecanismo nao e carregado no perfil padrao, permanece desabilitado em
