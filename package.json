@@ -21,6 +21,9 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "test": "npm run build:sdk && npm run test --workspaces --if-present",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium",
+    "test:e2e:ui": "playwright test --ui",
     "typecheck": "npm run build:sdk && npm run typecheck --workspaces --if-present",
     "prepare": "husky"
   },
@@ -35,6 +38,7 @@
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.62.1",
     "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
