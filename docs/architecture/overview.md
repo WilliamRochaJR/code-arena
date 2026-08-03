@@ -78,22 +78,20 @@ andamento.
 
 ## Execucao local
 
-Durante o desenvolvimento, React e Spring Boot executam diretamente na maquina
-para facilitar hot reload e depuracao. O PostgreSQL executa em Docker Compose.
+Durante o desenvolvimento, React e Spring Boot podem executar diretamente na
+maquina para facilitar hot reload e depuracao, enquanto o PostgreSQL executa no
+Compose. Para validar o ambiente reproduzivel, o Compose executa toda a stack:
 
 ```text
-React/Vite :5173 --> Spring Boot :8080 --> PostgreSQL :5433 (host)
-                            |
-                            `--> Actuator/Prometheus
+Nginx/React :3000 --> Spring Boot :8080 --> PostgreSQL :5432 (rede interna)
+                          |
+                          `--> /actuator/prometheus <-- Prometheus :9090
 ```
 
-O Compose publica a porta interna `5432` do PostgreSQL como `5433` no host para
-evitar conflito com instalacoes locais do banco.
-
-Uma composicao completa com frontend, API e banco sera adicionada antes do
-primeiro release para oferecer uma execucao reproduzivel com um unico comando.
-Prometheus e Grafana serao adicionados posteriormente para observar a API no
-ambiente local.
+O Compose publica o PostgreSQL como `5433` no host para evitar conflito com
+instalacoes locais. Prometheus coleta a API pelo nome do servico na rede
+interna. Grafana sera adicionado sobre essa fonte de metricas para oferecer um
+dashboard local versionado.
 
 ## Destino de producao
 

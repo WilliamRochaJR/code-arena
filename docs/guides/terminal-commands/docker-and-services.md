@@ -132,3 +132,14 @@ curl --fail --silent --show-error \
 
 Use `health` para consultar a saude e `prometheus` para ler metricas. `--fail`
 faz respostas HTTP sem sucesso retornarem erro ao shell.
+
+## Consultar targets do Prometheus
+
+```bash
+curl --fail --silent --show-error \
+  http://localhost:9090/api/v1/targets | \
+  jq -r '.data.activeTargets[] | [.labels.job, .health, .scrapeUrl, .lastError] | @tsv'
+```
+
+Exibe job, estado, URL de coleta e ultimo erro de cada target ativo. Requer
+`jq` para condensar a resposta JSON da API do Prometheus.

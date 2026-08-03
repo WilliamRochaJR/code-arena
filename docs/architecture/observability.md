@@ -48,12 +48,20 @@ padrao. A API nao deve depender de arquivos de log dentro do container. Senhas,
 tokens, credenciais, cabecalhos de autorizacao e outros dados sensiveis nunca
 devem ser registrados.
 
-## Metricas e dashboards locais
+## Metricas locais
 
-Em uma entrega posterior, o Docker Compose local incluira:
+O Docker Compose local inclui Prometheus para coletar periodicamente o endpoint
+`/actuator/prometheus` da API. A configuracao versionada define o target pelo
+nome do servico na rede interna, sem depender da porta publicada no host.
 
-- Prometheus para coletar periodicamente o endpoint
-  `/actuator/prometheus`;
+O armazenamento usa um volume nomeado para preservar as series entre reinicios
+locais. Essa retencao e destinada a diagnostico e estudo, nao representa uma
+politica de retencao de producao.
+
+## Dashboards locais
+
+Na proxima etapa, o Docker Compose local incluira:
+
 - Grafana para consultar o Prometheus;
 - dashboard versionado com disponibilidade, latencia, volume de requisicoes,
   respostas por status HTTP e metricas da JVM;

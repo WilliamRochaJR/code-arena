@@ -32,6 +32,7 @@ Depois da inicializacao, acesse:
 
 - frontend: `http://localhost:3000`;
 - API: `http://localhost:8080`;
+- Prometheus: `http://localhost:9090`;
 - PostgreSQL: `localhost:5433`.
 
 As migracoes Flyway sao aplicadas pela API durante a inicializacao. Os valores
