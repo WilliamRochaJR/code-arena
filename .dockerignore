@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.vscode
+**/node_modules
+**/dist
+**/coverage
+apps/api/target
+*.iml
+*.log
+**/.env*
+!**/.env.example

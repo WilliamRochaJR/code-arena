@@ -10,6 +10,12 @@ Executa o Dockerfile do contexto informado e atribui um nome e tag a imagem. O
 contexto deve conter apenas os arquivos necessarios para o build; em um
 monorepositorio, ele tambem precisa incluir os workspaces consumidos.
 
+Quando o Dockerfile nao esta na raiz do contexto, informe seu caminho:
+
+```bash
+docker build -f <caminho-do-Dockerfile> -t <imagem>:<tag> <contexto>
+```
+
 ## Inspecionar configuracoes de uma imagem
 
 ```bash

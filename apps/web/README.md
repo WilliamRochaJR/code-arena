@@ -98,6 +98,20 @@ iniciar o frontend:
 VITE_API_URL=http://localhost:8080 npm run dev:web
 ```
 
+## Imagem Docker
+
+Na raiz do monorepositorio, construa a imagem informando o Dockerfile do
+frontend:
+
+```bash
+docker build -f apps/web/Dockerfile -t code-arena-web:local .
+```
+
+O estagio de build usa Node.js 22 e instala os workspaces pelo lockfile. Ele
+compila primeiro o Java Quiz SDK e depois a aplicacao. O runtime usa Nginx sem
+privilegios na porta `8080`, encaminha `/api` ao servico `api` e entrega
+`index.html` como fallback das rotas da SPA.
+
 O fluxo implementado configura, cria e executa uma tentativa pela cadeia:
 
 ```text
