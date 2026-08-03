@@ -4,6 +4,22 @@
   grid-template-rows: auto 1fr auto;
 }
 
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-page .status-card {
+  width: min(100%, 620px);
+  margin: 0;
+}
+
+.topbar-signout {
+  margin: 0;
+}
+
 .topbar,
 .footer {
   width: min(1180px, calc(100% - 48px));

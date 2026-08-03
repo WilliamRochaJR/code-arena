@@ -7,16 +7,18 @@ import { DifficultySelectionPage } from './quiz/DifficultySelectionPage'
 import { QuizAttemptPage } from './quiz/QuizAttemptPage'
 import { QuizAttemptHistoryPage } from './quiz/QuizAttemptHistoryPage'
 import { QuizResultPage } from './quiz/QuizResultPage'
+import type { AuthSession } from './auth/types'
 import './App.css'
 
 interface AppProps {
   client?: JavaQuizClient
+  session?: AuthSession
 }
 
-function App({ client = javaQuizClient }: AppProps) {
+function App({ client = javaQuizClient, session }: AppProps) {
   return (
     <Routes>
-      <Route element={<AppLayout />}>
+      <Route element={<AppLayout session={session} />}>
         <Route index element={<Navigate replace to="/quiz/categories" />} />
         <Route
           path="/quiz/categories"
@@ -44,7 +46,7 @@ function App({ client = javaQuizClient }: AppProps) {
   )
 }
 
-function AppLayout() {
+function AppLayout({ session }: { session: AuthSession | undefined }) {
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -60,6 +62,20 @@ function AppLayout() {
         </Link>
         <nav className="topbar-nav" aria-label="Navegação principal">
           <Link to="/quiz-attempts">Minhas tentativas</Link>
+          {session?.user && (
+            <span className="step-label">
+              {session.user.displayName ?? 'Pessoa autenticada'}
+            </span>
+          )}
+          {session && (
+            <button
+              className="text-button topbar-signout"
+              type="button"
+              onClick={() => void session.signOut()}
+            >
+              Sair
+            </button>
+          )}
           <span className="step-label">Treino Java</span>
         </nav>
       </header>
