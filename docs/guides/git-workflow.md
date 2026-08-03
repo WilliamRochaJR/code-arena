@@ -28,6 +28,54 @@ como branch permanente. Correcoes feitas em `release/*` ou `hotfix/*` retornam
 diretamente dessas branches para `develop`; nao se usa uma sincronizacao geral
 entre `main` e `develop` para substituir esses retornos explicitos.
 
+## Exemplo de historico
+
+O `flowchart` anterior define as regras. O `gitGraph` abaixo mostra apenas um
+exemplo cronologico de commits e merges que respeita essas regras:
+
+```mermaid
+gitGraph
+    commit id: "inicio do repositorio"
+
+    branch develop
+    checkout develop
+    commit id: "preparar proxima versao"
+
+    branch feature_044
+    checkout feature_044
+    commit id: "implementar entrega"
+    commit id: "adicionar testes"
+
+    checkout develop
+    merge feature_044 id: "PR feature para develop"
+
+    branch release_1_0_0
+    checkout release_1_0_0
+    commit id: "preparar release"
+    commit id: "corrigir release"
+
+    checkout develop
+    merge release_1_0_0 id: "retornar correcoes"
+
+    checkout main
+    merge release_1_0_0 id: "publicar release" tag: "v1.0.0"
+
+    branch hotfix_1_0_1
+    checkout hotfix_1_0_1
+    commit id: "corrigir producao"
+
+    checkout main
+    merge hotfix_1_0_1 id: "publicar hotfix" tag: "v1.0.1"
+
+    checkout develop
+    merge hotfix_1_0_1 id: "incorporar hotfix"
+```
+
+Os identificadores `feature_044`, `release_1_0_0` e `hotfix_1_0_1` evitam
+caracteres que alguns renderizadores interpretam de forma diferente. No Git,
+eles representam, respectivamente, branches como `feature/044-descricao`,
+`release/1.0.0` e `hotfix/1.0.1-descricao`.
+
 ## Branches permanentes
 
 - `main`: estado estavel e releases.
