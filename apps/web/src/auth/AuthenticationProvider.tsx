@@ -1,7 +1,8 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { AuthProvider as OidcProvider, useAuth } from 'react-oidc-context'
 import { WebStorageStateStore } from 'oidc-client-ts'
 
+import { getValidAccessToken, type TokenRenewalState } from './access-token'
 import { AuthSessionContext } from './AuthContext'
 import { readAuthConfig } from './config'
 import type { AuthenticationProviderProps, AuthSession } from './types'
@@ -44,6 +45,7 @@ function LocalAuthenticationProvider({
     () => ({
       error: null,
       getAccessToken: async () => null,
+      handleUnauthorized: async () => undefined,
       isAuthenticated: true,
       isLoading: false,
       signIn: async () => undefined,
@@ -69,6 +71,7 @@ function OidcAuthenticationBridge({
   cognitoDomain,
 }: AuthenticationProviderProps & { cognitoDomain: string }) {
   const auth = useAuth()
+  const renewalRef = useRef<TokenRenewalState>({ current: null })
   const signIn = useCallback(async () => {
     await auth.signinRedirect({
       extraQueryParams: { identity_provider: 'Google' },
@@ -85,13 +88,22 @@ function OidcAuthenticationBridge({
     window.location.assign(logoutUrl.toString())
   }, [auth, cognitoDomain])
   const getAccessToken = useCallback(
-    async () => auth.user?.access_token ?? null,
-    [auth.user?.access_token],
+    () =>
+      getValidAccessToken(
+        auth.user,
+        () => auth.signinSilent(),
+        renewalRef.current,
+      ),
+    [auth],
   )
+  const handleUnauthorized = useCallback(async () => {
+    await auth.removeUser()
+  }, [auth])
   const session = useMemo<AuthSession>(
     () => ({
       error: auth.error ?? null,
       getAccessToken,
+      handleUnauthorized,
       isAuthenticated: auth.isAuthenticated,
       isLoading: auth.isLoading || Boolean(auth.activeNavigator),
       signIn,
@@ -106,7 +118,7 @@ function OidcAuthenticationBridge({
           }
         : null,
     }),
-    [auth, getAccessToken, signIn, signOut],
+    [auth, getAccessToken, handleUnauthorized, signIn, signOut],
   )
 
   return (

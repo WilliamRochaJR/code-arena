@@ -118,6 +118,11 @@ substituidas por `VITE_COGNITO_REDIRECT_URI` e
 `VITE_COGNITO_POST_LOGOUT_REDIRECT_URI`. Nenhuma variavel `VITE_*` pode conter
 client secret, pois seu valor faz parte do bundle entregue ao navegador.
 
+No modo OIDC, a camada de autenticacao fornece exclusivamente o access token ao
+Java Quiz SDK. Se o token estiver expirado, requisicoes concorrentes aguardam a
+mesma renovacao silenciosa. Se a API ainda responder `401`, a sessao local e
+removida e a interface volta a solicitar login, evitando repeticoes infinitas.
+
 ## Imagem Docker
 
 Na raiz do monorepositorio, construa a imagem informando o Dockerfile do

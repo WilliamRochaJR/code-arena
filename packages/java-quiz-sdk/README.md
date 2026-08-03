@@ -30,6 +30,7 @@ import { createJavaQuizClient } from '@code-arena/java-quiz-sdk'
 
 const client = createJavaQuizClient({
   baseUrl: 'http://localhost:8080',
+  onUnauthorized: () => session.clear(),
   tokenProvider: () => session.accessToken,
 })
 
@@ -85,6 +86,10 @@ const history = await client.attempts.list({
 
 O `tokenProvider` e opcional para permitir o perfil local com identidade
 controlada. Em ambientes autenticados, ele deve fornecer somente o access token.
+Quando a API responder `401`, o SDK chama `onUnauthorized` antes de propagar o
+`JavaQuizHttpError`; assim a aplicacao pode descartar a sessao expirada sem
+acoplar o cliente HTTP ao provedor de identidade. Uma falha nessa limpeza nao
+oculta a resposta original da API.
 
 Para cancelar uma requisicao:
 

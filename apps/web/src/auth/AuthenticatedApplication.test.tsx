@@ -44,6 +44,7 @@ function renderWithSession(overrides: Partial<AuthSession>) {
   const session: AuthSession = {
     error: null,
     getAccessToken: async () => null,
+    handleUnauthorized: async () => undefined,
     isAuthenticated: false,
     isLoading: false,
     signIn: async () => undefined,
