@@ -56,21 +56,24 @@ code-arena/
 
 ## Comunicacao
 
-```text
-Usuario
-  |
-  v
-React ----> Cognito/Google
-  |
-  v
-Java Quiz SDK
-  |  Authorization: Bearer <access token>
-  v
-Spring Boot API
-  |
-  v
-PostgreSQL
+```mermaid
+flowchart LR
+    User[Pessoa usuaria] --> Web[React]
+    Web --> SDK[Java Quiz SDK]
+    SDK -->|Authorization: Bearer access token| API[Spring Boot API]
+    API --> DB[(PostgreSQL)]
+
+    Web -.->|login OIDC planejado| Cognito[Amazon Cognito]
+    Cognito -.->|federacao planejada| Google[Google]
+    UI[Biblioteca de UI] -->|componentes e tokens| Web
+
+    classDef planned stroke-dasharray: 5 5
+    class Cognito,Google planned
 ```
+
+As linhas continuas representam o fluxo implementado. As linhas tracejadas
+identificam a integracao externa preparada no codigo, mas ainda dependente do
+provisionamento AWS.
 
 O frontend recebe apenas dados necessarios para apresentar a questao. A API nao
 envia a alternativa correta ou a explicacao enquanto a tentativa estiver em
@@ -82,10 +85,13 @@ Durante o desenvolvimento, React e Spring Boot podem executar diretamente na
 maquina para facilitar hot reload e depuracao, enquanto o PostgreSQL executa no
 Compose. Para validar o ambiente reproduzivel, o Compose executa toda a stack:
 
-```text
-Nginx/React :3000 --> Spring Boot :8080 --> PostgreSQL :5432 (rede interna)
-                          |
-                          `--> /actuator/prometheus <-- Prometheus :9090
+```mermaid
+flowchart LR
+    Browser[Navegador] -->|porta 3000| Web[Nginx e React]
+    Web -->|rede interna| API[Spring Boot API]
+    API -->|porta 5432 interna| DB[(PostgreSQL)]
+    Prometheus[Prometheus] -->|coleta /actuator/prometheus| API
+    Grafana[Grafana] -->|consulta| Prometheus
 ```
 
 O Compose publica o PostgreSQL como `5433` no host para evitar conflito com

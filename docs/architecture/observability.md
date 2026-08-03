@@ -9,12 +9,25 @@ sem necessidade durante as primeiras entregas.
 
 ## Visao geral
 
-```text
-Metricas:     Micrometer -> Prometheus -> Grafana
-Logs:         SLF4J -> Logback -> console
-Visualizacao: futuramente Logback -> Loki -> Grafana
-Tracing:      futuramente OpenTelemetry -> Tempo -> Grafana
+```mermaid
+flowchart LR
+    API[Spring Boot API] -->|metricas com Micrometer| Prometheus[Prometheus]
+    Prometheus -->|datasource| Grafana[Grafana]
+
+    API -->|API SLF4J| Logback[Logback]
+    Logback -->|saida padrao| Console[Console]
+
+    Logback -.->|planejado| Loki[Loki]
+    Loki -.->|planejado| Grafana
+    API -.->|OpenTelemetry planejado| Tempo[Tempo]
+    Tempo -.->|planejado| Grafana
+
+    classDef planned stroke-dasharray: 5 5
+    class Loki,Tempo planned
 ```
+
+Linhas continuas representam a stack local implementada. Linhas tracejadas
+representam a evolucao planejada, ainda fora do ambiente executavel.
 
 Cada fluxo possui uma responsabilidade:
 
