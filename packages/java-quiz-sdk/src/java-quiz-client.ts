@@ -14,8 +14,10 @@ import type {
   JavaQuizClient,
   JavaQuizClientOptions,
   ListCategoriesOptions,
+  ListQuizAttemptsOptions,
   ProblemDetail,
   QuizAttemptSummary,
+  QuizAttemptHistory,
   QuizDifficulty,
   SavedQuizAnswer,
   SaveQuizAnswerRequest,
@@ -123,6 +125,27 @@ export function createJavaQuizClient(
       },
     },
     attempts: {
+      async list(
+        listOptions: ListQuizAttemptsOptions = {},
+      ): Promise<QuizAttemptHistory> {
+        const search = new URLSearchParams()
+        if (listOptions.page !== undefined)
+          search.set('page', `${listOptions.page}`)
+        if (listOptions.size !== undefined)
+          search.set('size', `${listOptions.size}`)
+        if (listOptions.status !== undefined)
+          search.set('status', listOptions.status)
+        const query = search.toString()
+        const body = await request(
+          `/api/v1/quiz-attempts${query ? `?${query}` : ''}`,
+          listOptions.signal === undefined
+            ? {}
+            : { signal: listOptions.signal },
+        )
+        if (!isQuizAttemptHistory(body))
+          throw new JavaQuizInvalidResponseError()
+        return body
+      },
       async create(
         createRequest: CreateQuizAttemptRequest,
         createOptions,
@@ -320,6 +343,32 @@ function isCompletedQuizQuestion(value: unknown): boolean {
     typeof value.correctAlternativeId === 'string' &&
     typeof value.correct === 'boolean' &&
     typeof value.explanation === 'string'
+  )
+}
+
+function isQuizAttemptHistory(value: unknown): value is QuizAttemptHistory {
+  return (
+    isRecord(value) &&
+    Array.isArray(value.items) &&
+    value.items.every(isQuizAttemptHistoryItem) &&
+    typeof value.page === 'number' &&
+    typeof value.size === 'number' &&
+    typeof value.totalItems === 'number' &&
+    typeof value.totalPages === 'number'
+  )
+}
+
+function isQuizAttemptHistoryItem(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    (value.status === 'IN_PROGRESS' || value.status === 'COMPLETED') &&
+    isQuizDifficulty(value.difficulty) &&
+    Array.isArray(value.categories) &&
+    value.categories.every((item) => typeof item === 'string') &&
+    (value.score === null || typeof value.score === 'number') &&
+    typeof value.startedAt === 'string' &&
+    (value.completedAt === null || typeof value.completedAt === 'string')
   )
 }
 

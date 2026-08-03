@@ -56,6 +56,102 @@
   color: var(--muted);
   font-size: 0.72rem;
 }
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.topbar-nav a {
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+.history-panel {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  box-shadow: 10px 10px 0 var(--shadow-color);
+}
+.history-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 30px;
+  border-bottom: 1px solid var(--border);
+}
+.history-heading h2 {
+  margin: 0;
+}
+.history-filters {
+  display: flex;
+  gap: 8px;
+}
+.history-filter {
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: var(--surface-muted);
+  cursor: pointer;
+}
+.history-filter--active {
+  border-color: var(--violet);
+  color: var(--violet);
+  background: var(--violet-soft);
+  font-weight: 800;
+}
+.history-list {
+  display: grid;
+  gap: 1px;
+  background: var(--border);
+}
+.history-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 26px 30px;
+  background: var(--surface);
+}
+.history-card h3 {
+  margin: 12px 0 6px;
+}
+.history-card p,
+.history-card small {
+  color: var(--muted);
+}
+.attempt-status {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.attempt-status--completed {
+  color: var(--violet);
+}
+.attempt-status--in_progress {
+  color: var(--danger);
+}
+.history-result {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.history-result > strong {
+  font-size: 1.8rem;
+}
+.history-result [role='alert'] {
+  color: var(--danger);
+  font-size: 0.72rem;
+}
+.history-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 30px;
+  border-top: 1px solid var(--border);
+}
 
 .main-content {
   width: min(920px, calc(100% - 48px));
@@ -836,6 +932,28 @@
 }
 
 @media (max-width: 680px) {
+  .topbar-nav .step-label {
+    display: none;
+  }
+  .history-heading,
+  .history-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .history-filters {
+    overflow-x: auto;
+  }
+  .history-filter {
+    white-space: nowrap;
+  }
+  .history-result {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .history-pagination {
+    flex-wrap: wrap;
+    padding: 20px;
+  }
   .performance-grid {
     grid-template-columns: 1fr;
   }

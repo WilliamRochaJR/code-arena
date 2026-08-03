@@ -5,6 +5,7 @@ import { javaQuizClient } from './api/java-quiz-client'
 import { CategorySelectionPage } from './quiz/CategorySelectionPage'
 import { DifficultySelectionPage } from './quiz/DifficultySelectionPage'
 import { QuizAttemptPage } from './quiz/QuizAttemptPage'
+import { QuizAttemptHistoryPage } from './quiz/QuizAttemptHistoryPage'
 import { QuizResultPage } from './quiz/QuizResultPage'
 import './App.css'
 
@@ -24,6 +25,10 @@ function App({ client = javaQuizClient }: AppProps) {
         <Route
           path="/quiz/difficulty"
           element={<DifficultySelectionPage client={client} />}
+        />
+        <Route
+          path="/quiz-attempts"
+          element={<QuizAttemptHistoryPage client={client} />}
         />
         <Route
           path="/quiz-attempts/:attemptId/questions/:position"
@@ -53,7 +58,10 @@ function AppLayout() {
           </span>
           <span>Code Arena</span>
         </Link>
-        <span className="step-label">Treino Java</span>
+        <nav className="topbar-nav" aria-label="Navegação principal">
+          <Link to="/quiz-attempts">Minhas tentativas</Link>
+          <span className="step-label">Treino Java</span>
+        </nav>
       </header>
 
       <Outlet />

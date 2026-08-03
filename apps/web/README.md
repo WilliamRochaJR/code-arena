@@ -115,6 +115,10 @@ duplicados, apresenta erros com retry e salva a alternativa antes de avancar. A
 conclusao exige confirmacao e leva a um resultado recarregavel com pontuacao,
 desempenho por categoria, respostas corretas e explicacoes.
 
+O historico em `/quiz-attempts` possui filtros e pagina na URL. Tentativas em
+andamento continuam na primeira pergunta pendente, enquanto tentativas
+concluidas abrem o resultado persistido.
+
 ## Decisoes do frontend
 
 ### SDK como fronteira HTTP
@@ -137,7 +141,7 @@ quiz. Isso torna as etapas navegaveis, preserva as escolhas no historico do
 browser e evita um store global para um estado curto. Depois da criacao, o ID da
 tentativa e a posicao passam a fazer parte do caminho
 `/quiz-attempts/{id}/questions/{position}`. O resultado usa
-`/quiz-attempts/{id}/result`.
+`/quiz-attempts/{id}/result`, e o historico usa `/quiz-attempts`.
 
 ### Risco residual do React Router
 

@@ -125,6 +125,13 @@ function createClient(
       list: vi.fn(() => categoriesResult),
     },
     attempts: {
+      list: vi.fn<JavaQuizClient['attempts']['list']>().mockResolvedValue({
+        items: [],
+        page: 0,
+        size: 10,
+        totalItems: 0,
+        totalPages: 0,
+      }),
       create: createAttempt,
       get: getAttempt,
       saveAnswer,
@@ -427,5 +434,77 @@ describe('App', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('Set não aceita duplicados.')).toBeInTheDocument()
     expect(screen.getByText(/Resposta correta:/)).toBeInTheDocument()
+  })
+
+  it('lists quiz history and filters completed attempts', async () => {
+    const user = userEvent.setup()
+    const client = createClient()
+    client.attempts.list = vi
+      .fn<JavaQuizClient['attempts']['list']>()
+      .mockResolvedValue({
+        items: [
+          {
+            id: ATTEMPT.id,
+            status: 'COMPLETED',
+            difficulty: 'INTERMEDIATE',
+            categories: ['OOP'],
+            score: 80,
+            startedAt: ATTEMPT.startedAt,
+            completedAt: '2026-07-22T18:40:00Z',
+          },
+        ],
+        page: 0,
+        size: 10,
+        totalItems: 1,
+        totalPages: 1,
+      })
+    renderApp(client, '/quiz-attempts')
+    expect(await screen.findByText('80%')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Ver resultado' })).toHaveAttribute(
+      'href',
+      `/quiz-attempts/${ATTEMPT.id}/result`,
+    )
+    await user.click(screen.getByRole('button', { name: 'Concluídas' }))
+    expect(client.attempts.list).toHaveBeenLastCalledWith(
+      expect.objectContaining({ page: 0, size: 10, status: 'COMPLETED' }),
+    )
+  })
+
+  it('continues an attempt at its first unanswered question', async () => {
+    const user = userEvent.setup()
+    const client = createClient()
+    client.attempts.list = vi
+      .fn<JavaQuizClient['attempts']['list']>()
+      .mockResolvedValue({
+        items: [
+          {
+            id: ATTEMPT.id,
+            status: 'IN_PROGRESS',
+            difficulty: 'INTERMEDIATE',
+            categories: ['OOP'],
+            score: null,
+            startedAt: ATTEMPT.startedAt,
+            completedAt: null,
+          },
+        ],
+        page: 0,
+        size: 10,
+        totalItems: 1,
+        totalPages: 1,
+      })
+    client.attempts.get = vi
+      .fn<JavaQuizClient['attempts']['get']>()
+      .mockResolvedValue({
+        ...ATTEMPT_DETAILS,
+        questions: [
+          { ...FIRST_QUESTION, selectedAlternativeId: FIRST_ALTERNATIVE_ID },
+          SECOND_QUESTION,
+        ],
+      })
+    renderApp(client, '/quiz-attempts')
+    await user.click(await screen.findByRole('button', { name: 'Continuar' }))
+    expect(
+      await screen.findByRole('heading', { name: SECOND_QUESTION.statement }),
+    ).toBeInTheDocument()
   })
 })

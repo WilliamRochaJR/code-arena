@@ -21,6 +21,7 @@ nem use `fetch` diretamente.
 | Tentativas | `attempts.get()`        | `GET /api/v1/quiz-attempts/{attemptId}`              | Disponivel |
 | Respostas  | `attempts.saveAnswer()` | `PUT /api/v1/quiz-attempts/{attemptId}/answers/{id}` | Disponivel |
 | Resultado  | `attempts.complete()`   | `POST /api/v1/quiz-attempts/{attemptId}/completion`  | Disponivel |
+| Historico  | `attempts.list()`       | `GET /api/v1/quiz-attempts`                          | Disponivel |
 
 ## Uso
 
@@ -71,6 +72,16 @@ const result = await client.attempts.complete(attempt.id)
 
 A operacao de conclusao e idempotente: depois da primeira conclusao, chamadas
 repetidas devolvem o resultado persistido pela API sem recalcular a tentativa.
+
+Para consultar tentativas concluidas com paginacao:
+
+```ts
+const history = await client.attempts.list({
+  page: 0,
+  size: 10,
+  status: 'COMPLETED',
+})
+```
 
 O `tokenProvider` e opcional para permitir o perfil local com identidade
 controlada. Em ambientes autenticados, ele deve fornecer somente o access token.
