@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Code Arena
+    orgId: 1
+    folder: Code Arena
+    type: file
+    disableDeletion: true
+    editable: false
+    options:
+      path: /var/lib/grafana/dashboards

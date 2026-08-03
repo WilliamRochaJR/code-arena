@@ -143,3 +143,14 @@ curl --fail --silent --show-error \
 
 Exibe job, estado, URL de coleta e ultimo erro de cada target ativo. Requer
 `jq` para condensar a resposta JSON da API do Prometheus.
+
+## Consultar saude e dashboards do Grafana
+
+```bash
+curl --fail --silent --show-error http://localhost:3001/api/health
+curl --fail --silent --show-error \
+  'http://localhost:3001/api/search?query=Code%20Arena'
+```
+
+Confirma a saude do Grafana e lista dashboards encontrados pelo provisionamento.
+O acesso anonimo local permite essas consultas sem credenciais.

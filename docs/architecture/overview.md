@@ -90,8 +90,7 @@ Nginx/React :3000 --> Spring Boot :8080 --> PostgreSQL :5432 (rede interna)
 
 O Compose publica o PostgreSQL como `5433` no host para evitar conflito com
 instalacoes locais. Prometheus coleta a API pelo nome do servico na rede
-interna. Grafana sera adicionado sobre essa fonte de metricas para oferecer um
-dashboard local versionado.
+interna. Grafana consulta essa fonte e carrega um dashboard local versionado.
 
 ## Destino de producao
 
