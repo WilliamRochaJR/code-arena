@@ -2,19 +2,46 @@ services:
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: code_arena
-      POSTGRES_PASSWORD: code_arena
-      POSTGRES_USER: code_arena
+      POSTGRES_DB: ${POSTGRES_DB:-code_arena}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-code_arena}
+      POSTGRES_USER: ${POSTGRES_USER:-code_arena}
     ports:
-      - '5433:5432'
+      - '${POSTGRES_PORT:-5433}:5432'
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U code_arena -d code_arena']
+      test:
+        ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
       interval: 5s
       timeout: 5s
       retries: 5
       start_period: 5s
     volumes:
       - code-arena-postgres-data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ./apps/api
+    environment:
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-code_arena}
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-code_arena}
+      DB_USERNAME: ${POSTGRES_USER:-code_arena}
+      SPRING_PROFILES_ACTIVE: local
+    depends_on:
+      postgres:
+        condition: service_healthy
+    init: true
+    ports:
+      - '${API_PORT:-8080}:8080'
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    depends_on:
+      api:
+        condition: service_healthy
+    init: true
+    ports:
+      - '${WEB_PORT:-3000}:8080'
 
 volumes:
   code-arena-postgres-data:

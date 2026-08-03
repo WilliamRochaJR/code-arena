@@ -37,6 +37,22 @@ container e removido automaticamente ao terminar.
 
 Execute o Compose na raiz do repositorio.
 
+## Iniciar a aplicacao completa
+
+```bash
+docker compose up -d --build --wait
+```
+
+Constroi as imagens alteradas, inicia todos os servicos em segundo plano e
+aguarda seus healthchecks. As dependencias declaradas fazem PostgreSQL, API e
+frontend ficarem disponiveis nessa ordem.
+
+Para sobrescrever temporariamente uma variavel sem criar `.env`:
+
+```bash
+<VARIAVEL>=<valor> docker compose up -d --build --wait
+```
+
 ## Validar o Compose
 
 ```bash
@@ -64,6 +80,24 @@ docker ps \
 ```
 
 Inclui servicos parados e ajuda a localizar conflitos de porta.
+
+## Diagnosticar healthcheck
+
+```bash
+docker inspect <container> --format '{{json .State.Health}}'
+```
+
+Exibe estado, tentativas e mensagens do healthcheck. Use tambem a secao de logs
+abaixo para comparar a verificacao de saude com a inicializacao da aplicacao.
+
+## Identificar processo em uma porta
+
+```bash
+ss -ltnp 'sport = :<porta>'
+```
+
+Mostra o processo local que escuta na porta. Se o processo nao for um container
+do projeto, nao o encerre antes de confirmar sua finalidade.
 
 ## Ler logs
 
