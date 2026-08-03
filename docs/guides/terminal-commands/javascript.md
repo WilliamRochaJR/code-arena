@@ -24,9 +24,11 @@ npm install <pacote> --workspace <workspace>
 
 ```bash
 npm audit
+npm audit --omit=dev
 ```
 
-Consulta vulnerabilidades. Sem `--fix`, nao atualiza pacotes.
+Consulta vulnerabilidades. `--omit=dev` limita o relatorio as dependencias de
+producao. Sem `--fix`, nenhum dos comandos atualiza pacotes.
 
 ## Executar a aplicacao web
 
@@ -35,6 +37,18 @@ npm run dev:web
 ```
 
 Inicia o Vite do workspace `@code-arena/web`.
+
+Para iniciar a integracao OIDC com valores publicos do App Client:
+
+```bash
+VITE_AUTH_MODE=oidc \
+VITE_COGNITO_ISSUER_URI=<issuer-do-user-pool> \
+VITE_COGNITO_DOMAIN=<dominio-do-managed-login> \
+VITE_COGNITO_CLIENT_ID=<id-publico-do-app-client> \
+npm run dev:web
+```
+
+Valores `VITE_*` sao incorporados ao bundle e nunca podem conter segredos.
 
 ## Executar a suite de qualidade
 

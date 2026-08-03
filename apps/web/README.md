@@ -57,6 +57,8 @@ As versoes exatas resolvidas ficam em [`package-lock.json`](../../package-lock.j
 | jest-dom              | Matchers semanticos para elementos do DOM       | Sim       | Sim    | Assercoes dos testes de componentes    |
 | jsdom                 | Ambiente de navegador para testes no Vitest     | Sim       | Sim    | Execucao dos testes React              |
 | React Router          | Navegacao declarativa entre etapas              | Sim       | Sim    | Configuracao e perguntas por posicao   |
+| react-oidc-context    | Estado e ciclo da sessao OIDC no React          | Sim       | Sim    | Login, callback, renovacao e logout    |
+| oidc-client-ts        | Authorization Code com PKCE no navegador        | Sim       | Sim    | Cliente de protocolo da camada OIDC    |
 | React Hook Form       | Estado e submissao de formularios               | Nao       | Nao    | Nos formularios do MVP                 |
 | Zod                   | Validacao de dados e schemas no frontend        | Nao       | Nao    | Nos formularios que exigirem validacao |
 | Playwright            | Testes ponta a ponta no navegador               | Sim       | Sim    | Fluxo completo do quiz em Chromium     |
@@ -97,6 +99,24 @@ iniciar o frontend:
 ```bash
 VITE_API_URL=http://localhost:8080 npm run dev:web
 ```
+
+Por padrao, `VITE_AUTH_MODE=local` usa a identidade controlada da API e nao
+depende da AWS. Para ativar a integracao OIDC, configure somente valores
+publicos e URLs registradas no App Client do Cognito:
+
+```bash
+VITE_AUTH_MODE=oidc \
+VITE_COGNITO_ISSUER_URI=<issuer-do-user-pool> \
+VITE_COGNITO_DOMAIN=<dominio-do-managed-login> \
+VITE_COGNITO_CLIENT_ID=<id-publico-do-app-client> \
+npm run dev:web
+```
+
+As URLs de callback e logout usam, por padrao,
+`http://localhost:5173/auth/callback` e `http://localhost:5173`. Elas podem ser
+substituidas por `VITE_COGNITO_REDIRECT_URI` e
+`VITE_COGNITO_POST_LOGOUT_REDIRECT_URI`. Nenhuma variavel `VITE_*` pode conter
+client secret, pois seu valor faz parte do bundle entregue ao navegador.
 
 ## Imagem Docker
 
