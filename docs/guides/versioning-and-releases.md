@@ -179,6 +179,52 @@ Nao criar tags em:
 
 ## Fluxo de release
 
+O `gitGraph` mostra em que ponto do historico cada tag e criada. As branches de
+release partem de `develop`, mas a tag aparece somente depois que a release foi
+aprovada e incorporada em `main`:
+
+```mermaid
+gitGraph
+    commit id: "inicio do produto"
+
+    branch develop
+    checkout develop
+    commit id: "desenvolver marco 0.1.0"
+
+    branch release_0_1_0
+    checkout release_0_1_0
+    commit id: "preparar versao 0.1.0"
+
+    checkout main
+    merge release_0_1_0 id: "publicar 0.1.0" tag: "v0.1.0"
+
+    checkout develop
+    merge release_0_1_0 id: "incorporar ajustes 0.1.0"
+    commit id: "desenvolver marco 0.2.0"
+
+    branch release_0_2_0
+    checkout release_0_2_0
+    commit id: "preparar versao 0.2.0"
+
+    checkout main
+    merge release_0_2_0 id: "publicar 0.2.0" tag: "v0.2.0"
+
+    branch hotfix_0_2_1
+    checkout hotfix_0_2_1
+    commit id: "corrigir versao 0.2.0"
+
+    checkout main
+    merge hotfix_0_2_1 id: "publicar 0.2.1" tag: "v0.2.1"
+
+    checkout develop
+    merge hotfix_0_2_1 id: "incorporar correcao 0.2.1"
+```
+
+No diagrama, `release_0_1_0`, `release_0_2_0` e `hotfix_0_2_1` representam as
+branches reais `release/0.1.0`, `release/0.2.0` e `hotfix/0.2.1-descricao`. A
+notacao `tag` associa visualmente a versao ao merge aprovado em `main`; na
+execucao real, a tag anotada e criada depois desse merge com `git tag -a`.
+
 ### 1. Criar a branch
 
 Parta de `develop` validada:
