@@ -134,6 +134,29 @@ class QuizAttemptAnswerApiIntegrationTests {
 				.value("Tentativa nao encontrada."));
 	}
 
+	@Test
+	void hidesAttemptOwnedByAnotherUserWhenSavingAnswer() throws Exception {
+		AttemptContext context = createAttemptContext();
+		UUID otherUserId = UUID.randomUUID();
+		OffsetDateTime now = OffsetDateTime.parse("2026-08-01T12:00:00Z");
+		jdbcTemplate.update("""
+			INSERT INTO app_users (
+			  id, identity_provider_subject, email, display_name,
+			  created_at, last_login_at
+			) VALUES (?, ?, ?, ?, ?, ?)
+			""", otherUserId, "other-subject", "other@example.com", "Other", now, now);
+		jdbcTemplate.update(
+			"UPDATE quiz_attempts SET user_id = ? WHERE id = ?",
+			otherUserId,
+			context.attemptId());
+		entityManager.clear();
+
+		saveAnswer(context, context.alternativeIds().get(0))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.detail")
+				.value("Tentativa nao encontrada."));
+	}
+
 	private org.springframework.test.web.servlet.ResultActions saveAnswer(
 		AttemptContext context,
 		UUID alternativeId
