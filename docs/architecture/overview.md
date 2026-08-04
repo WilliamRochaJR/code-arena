@@ -101,16 +101,18 @@ interna. Grafana consulta essa fonte e carrega um dashboard local versionado.
 ## Destino de producao
 
 ```text
-Amplify Hosting ou S3/CloudFront --> React
+Amplify Hosting                  --> React
 Cognito + Google                 --> identidade
-App Runner + ECR                 --> API Spring Boot
+ECS Fargate + ALB + ECR          --> API Spring Boot
 RDS PostgreSQL                   --> dados
 CloudWatch                       --> logs e metricas
 Secrets Manager                  --> segredos do banco
 ```
 
-Terraform e deploy AWS entram depois que o fluxo completo estiver validado
-localmente.
+O bootstrap Terraform esta preparado sem recursos provisionaveis. A arquitetura
+AWS usa um ambiente temporario, criado para validacao e destruido depois da
+demonstracao para limitar custos. Consulte o
+[ADR 0008](../decisions/0008-use-ephemeral-ecs-fargate-on-aws.md).
 
 ## Principios
 

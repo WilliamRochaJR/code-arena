@@ -42,3 +42,14 @@ Um ADR aceito nao deve ser reescrito para esconder a historia. Uma mudanca de
 decisao gera um novo registro que substitui o anterior.
 
 Use [template.md](template.md) como ponto de partida.
+
+## Registros
+
+- [ADR 0001: Usar monorepositorio](0001-use-monorepo.md)
+- [ADR 0002: Usar Git Flow simplificado](0002-use-simplified-git-flow.md)
+- [ADR 0003: Manter o repositorio privado durante o desenvolvimento](0003-keep-repository-private-during-development.md)
+- [ADR 0004: Usar Semantic Versioning](0004-use-semantic-versioning.md)
+- [ADR 0005: Preservar o historico das tentativas](0005-preserve-quiz-attempt-history.md)
+- [ADR 0006: Usar React Router sem RSC](0006-use-react-router-with-rsc-disabled.md)
+- [ADR 0007: Usar cliente OIDC generico](0007-use-generic-oidc-client.md)
+- [ADR 0008: Usar ECS Fargate em ambiente AWS temporario](0008-use-ephemeral-ecs-fargate-on-aws.md)
