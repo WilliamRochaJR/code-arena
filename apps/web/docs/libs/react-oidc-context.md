@@ -19,9 +19,9 @@ npm install react-oidc-context --workspace @code-arena/web
 
 ## Onde e usada
 
-- [provider e logout](../../src/auth/AuthenticationProvider.tsx)
-- [configuracao externa](../../src/auth/config.ts)
-- [contexto da aplicacao](../../src/auth/AuthContext.ts)
+- [provider e logout - apps/web/src/auth/AuthenticationProvider.tsx](../../src/auth/AuthenticationProvider.tsx)
+- [configuracao externa - apps/web/src/auth/config.ts](../../src/auth/config.ts)
+- [contexto da aplicacao - apps/web/src/auth/AuthContext.ts](../../src/auth/AuthContext.ts)
 
 O SDK nao depende desta biblioteca. Tokens permanecem sob responsabilidade da
 camada de autenticacao. Consulte o [projeto oficial](https://github.com/authts/react-oidc-context).
