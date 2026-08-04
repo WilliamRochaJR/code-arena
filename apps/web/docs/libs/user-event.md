@@ -20,8 +20,8 @@ await user.click(screen.getByRole('button', { name: /continuar/i }))
 
 ## Onde e usada
 
-- [fluxo principal - apps/web/src/App.test.tsx](../../src/App.test.tsx)
-- [login e logout - apps/web/src/auth/AuthenticatedApplication.test.tsx](../../src/auth/AuthenticatedApplication.test.tsx)
+- fluxo principal - [apps/web/src/App.test.tsx](../../src/App.test.tsx)
+- login e logout - [apps/web/src/auth/AuthenticatedApplication.test.tsx](../../src/auth/AuthenticatedApplication.test.tsx)
 
 Crie uma sessao com `setup()` dentro do teste e aguarde as interacoes assincronas.
 Consulte a [documentacao oficial](https://testing-library.com/docs/user-event/intro/).

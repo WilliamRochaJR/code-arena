@@ -21,8 +21,8 @@ test: {
 
 ## Onde e usado
 
-- [configuracao Vite e Vitest - apps/web/vite.config.ts](../../vite.config.ts)
-- [setup do DOM - apps/web/src/test/setup.ts](../../src/test/setup.ts)
+- configuracao Vite e Vitest - [apps/web/vite.config.ts](../../vite.config.ts)
+- setup do DOM - [apps/web/src/test/setup.ts](../../src/test/setup.ts)
 
 jsdom nao substitui testes E2E: layout, navegacao e APIs completas do browser
 devem ser validados com Playwright. Consulte o [projeto oficial](https://github.com/jsdom/jsdom).
