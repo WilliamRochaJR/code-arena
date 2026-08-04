@@ -20,9 +20,9 @@ await page.getByRole('button', { name: /continuar/i }).click()
 
 ## Onde e usado
 
-- [configuracao](../../../../playwright.config.ts)
-- [fluxo do quiz](../../../../e2e/quiz-flow.spec.ts)
-- [guia E2E](../../../../e2e/README.md)
+- [configuracao - playwright.config.ts](../../../../playwright.config.ts)
+- [fluxo do quiz - e2e/quiz-flow.spec.ts](../../../../e2e/quiz-flow.spec.ts)
+- [guia E2E - e2e/README.md](../../../../e2e/README.md)
 
 Playwright complementa Vitest e jsdom; ele nao substitui testes unitarios mais
 rapidos. Consulte a [documentacao oficial](https://playwright.dev/docs/intro).

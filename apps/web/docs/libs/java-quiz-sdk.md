@@ -22,10 +22,10 @@ const categories = await client.categories.list()
 
 ## Onde e usado
 
-- [adaptador do cliente](../../src/api/java-quiz-client.ts)
-- [integracao autenticada](../../src/auth/AuthenticatedApplication.tsx)
-- [paginas do quiz](../../src/quiz/QuizAttemptPage.tsx)
-- [README completo do SDK](../../../../packages/java-quiz-sdk/README.md)
+- [adaptador do cliente - apps/web/src/api/java-quiz-client.ts](../../src/api/java-quiz-client.ts)
+- [integracao autenticada - apps/web/src/auth/AuthenticatedApplication.tsx](../../src/auth/AuthenticatedApplication.tsx)
+- [pagina da tentativa - apps/web/src/quiz/QuizAttemptPage.tsx](../../src/quiz/QuizAttemptPage.tsx)
+- [README completo do SDK - packages/java-quiz-sdk/README.md](../../../../packages/java-quiz-sdk/README.md)
 
 Componentes nao devem usar `fetch` diretamente. O SDK recebe apenas o access
 token e permanece independente de React e Cognito.
