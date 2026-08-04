@@ -14,6 +14,8 @@ uma biblioteca de componentes e uma API Java 21 com Spring Boot.
   reutilizavel e independente de React.
 - Biblioteca de UI - scaffold em `packages/ui`; a documentacao sera adicionada
   com os primeiros componentes.
+- [Infraestrutura Terraform](infrastructure/terraform/README.md) - bootstrap da
+  arquitetura AWS temporaria, ainda sem recursos provisionaveis.
 
 ## Documentacao tecnica
 
